@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>📝 NOTE • BÁO CÁO</title>
+  <style>
+    :root{
+      --bg: #f7fafc; --surface: #ffffff; --text: #0b1320; --muted: #5b677a; --border: #e7edf3;
+      --shadow: 0 12px 40px rgba(17, 24, 39, .08); --radius: 16px;
+      --primary: #2563eb; --primary-soft: #e9f0ff; --success: #10b981; --warning: #f59e0b; --violet: #7c3aed;
+      --chip-bg: #eef2ff; --chip-fg: #4338ca; --link: #1d4ed8;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --bg:#0b1220; --surface:#0f172a; --text:#e6edf3; --muted:#9fb0c2; --border:#1f2937; --shadow:0 10px 30px rgba(0,0,0,.35);
+        --chip-bg:#1f2a52; --chip-fg:#a5b4fc; --link:#93c5fd; --primary-soft:#13234f; }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    /* Smooth scroll for in-page anchors */
+    html{ scroll-behavior: smooth; }
+    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Arial, sans-serif;}
+    .hero{
+      position: relative; padding: 56px 20px 34px;
+      background:
+        radial-gradient(1100px 400px at -10% -30%, rgba(37, 99, 235, .18), transparent 60%),
+        radial-gradient(900px 480px at 120% -20%, rgba(16, 185, 129, .14), transparent 58%),
+        linear-gradient(180deg, #fbfdff, #f6f9fc);
+      border-bottom: 1px solid var(--border); overflow: hidden;
+    }
+    .hero:before{ content:""; position:absolute; inset:auto -10% 0 -10%; height:180px;
+      background: radial-gradient(60% 100% at 50% 0, rgba(37,99,235,.18), transparent 55%);
+      filter: blur(18px); opacity:.6; pointer-events:none; }
+    .container{width:min(1060px, 92vw); margin:0 auto; position:relative; z-index:1;}
+    .title{font-weight:900; font-size:30px; letter-spacing:.2px; margin:0 0 6px}
+    .subtitle{color:var(--muted); margin:0}
+    .quick{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-top:18px;}
+    .qa{
+      display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid var(--border);
+      background:var(--surface); border-radius:12px; box-shadow:0 6px 16px rgba(2,6,23,.04);
+      text-decoration:none; color:var(--text); font-weight:800; cursor:pointer;
+      transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .qa:hover{ transform:translateY(-1px); box-shadow:0 12px 22px rgba(2,6,23,.08); background:#f8fbff }
+    .qa svg{flex:0 0 22px}
+    .qa.blue svg{color:#2563eb} .qa.green svg{color:#059669} .qa.amber svg{color:#b45309} .qa.violet svg{color:#7c3aed}
+    main{ padding: 24px 20px; }
+    .stack{ display:grid; grid-template-columns: 1fr; gap:18px; }
+    .card{
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+      box-shadow: var(--shadow); padding: 22px 20px; animation: rise .35s cubic-bezier(.18,.89,.32,1.28) both;
+      scroll-margin-top: 90px; /* keep titles visible below header after scroll */
+    }
+    @keyframes rise{ from{ transform: translateY(8px); opacity:0 } to{ transform:none; opacity:1 } }
+    h2{ margin:0 0 12px; font-size:20px; display:flex; align-items:center; gap:8px }
+    .chip{ display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+      background: var(--chip-bg); color: var(--chip-fg); font-weight:800; font-size:12px; border:1px solid rgba(67,56,202,.12); }
+    ol{ margin: 10px 0 0 22px }
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; text-decoration:none; margin-top:12px;
+      padding:12px 16px; border-radius:12px; border:1px solid var(--border);
+      background:#f8fafc; color:var(--text); font-weight:800; box-shadow:0 3px 10px rgba(2,6,23,.06);
+      transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 8px 16px rgba(2, 6, 23, .09); background: #eef2f7 }
+    .btn.blue{ border-color: rgba(37,99,235,.25); background:rgba(37,99,235,.08) }
+    .btn.green{ border-color: rgba(5,150,105,.25); background:rgba(5,150,105,.08) }
+    .btn.amber{ border-color: rgba(245,158,11,.25); background:rgba(245,158,11,.10) }
+    .btn.violet{ border-color: rgba(124,58,237,.25); background: rgba(124,58,237,.10) }
+    .notice{ margin-top:10px; background:#fff7ed; border:1px solid #fed7aa; color:#7c2d12; padding: 10px 12px; border-radius: 12px; font-size: 14px; }
+    @media (prefers-color-scheme: dark){ .notice{ background:#1f170a; border-color:#61421c; color:#f2d3a3 } .btn{ background:#0b1220 } }
+    a{ color: var(--link) }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1 class="title">📝 NOTE • BÁO CÁO</h1>
+      <p class="subtitle">Giao diện sáng, hiện đại, nổi bật. Dùng trực tiếp trong Teams (tab Website) hoặc dán link.</p>
+      <nav class="quick" aria-label="Truy cập nhanh">
+        <a class="qa blue" href="#n1" role="button" tabindex="0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h18v2H3V5zm0 6h12v2H3v-2zm0 6h18v2H3v-2z"/></svg>
+          Bảng kê tính lãi
+        </a>
+        <a class="qa green" href="#n2" role="button" tabindex="0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5a2 2 0 0 0-2 2v14l4-4h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
+          Tiến độ hồ sơ
+        </a>
+        <a class="qa amber" href="#n3" role="button" tabindex="0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v8H3v-8zm4-4h2v12H7V9zm4 2h2v10h-2V11zm4-6h2v16h-2V5zm4 8h2v8h-2v-8z"/></svg>
+          Tỉ lệ hoàn thành
+        </a>
+        <a class="qa violet" href="#n4" role="button" tabindex="0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11 19V6l-2 2m6 11V8l-2 2M5 21h14"/></svg>
+          Tính KPI
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="stack">
+      <article id="n1" class="card">
+        <h2>— Nội dung 1 — <span class="chip">TooL Bảng kê tính lãi</span></h2>
+        <ol>
+          <li><b>Bước 1:</b> Copy <a href="https://vpb-my.sharepoint.com/personal/baotg10_vpbank_com_vn/_layouts/15/download.aspx?SourceUrl=/personal/baotg10_vpbank_com_vn/Documents/PQBKTL/allowlist.txt&xsdata=MDV8MDJ8fGZhMGYwMGI0NmZhYjQxNDk5YWZhMDhkZGYwNDg2OTBmfGZlMjI1ZWI1NmYzNjQwNDZiYTQ3OTIyZWI0YzViNGRlfDB8MHw2Mzg5MzA5MTU5NDc0NTk0Mjh8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T2pJNU5UVTJOVGt3TFRNd1lqSXRORGxoTnkwNE1qQXdMVGt4WXpnMk1ERmxOVFF4WlY4ME1EYzFaak5pT0MxaE1qTXpMVFF3WkRRdFltTXdaUzFpWW1VMFlUWTJPREUwWm1SQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56UTVORGM1TXprM01RPT18YjJhOTkyZTJhODJjNGNmMjUxOGQwOGRkZjA0ODY5MGZ8OWE4YWIwNTdhNTRhNDY2NDlmZTViNzIzOGFjNTIxOTU%3D&sdata=eFpKUm9IRFdTNTcxeXRpaTFYSXFoY0M3Vm5tTEZZeU5UK1RJUHJEbHpQdz0%3D&ovuser=fe225eb5-6f36-4046-ba47-922eb4c5b4de%2Cbaotg10%40vpbank.com.vn" target="_blank"><b>LINK</b></a> → mở Microsoft Edge → dán link → Enter → chọn <b>Save</b> để tải (bắt buộc dùng Edge).</li>
+          <li><b>Bước 2:</b> TẢI BẢNG KÊ TÍNH LÃI — mở thư mục tại đây.</li>
+        </ol>
+        <a class="btn blue" href="https://vpb-my.sharepoint.com/:f:/g/personal/baotg10_vpbank_com_vn/EkKKNm7Bt_FEsX--ivEjRbcBwUjx7s1kSrUsl2VvGj9I6g?e=FlTFFR&xsdata=MDV8MDJ8fGZhMGYwMGI0NmZhYjQxNDk5YWZhMDhkZGYwNDg2OTBmfGZlMjI1ZWI1NmYzNjQwNDZiYTQ3OTIyZWI0YzViNGRlfDB8MHw2Mzg5MzA5MTU5NDc0Nzk1MDh8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T2pJNU5UVTJOVGt3TFRNd1lqSXRORGxoTnkwNE1qQXdMVGt4WXpnMk1ERmxOVFF4WlY4ME1EYzFaak5pT0MxaE1qTXpMVFF3WkRRdFltTXdaUzFpWW1VMFlUWTJPREUwWm1SQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU56UTVORGM1TXprM01RPT18YjJhOTkyZTJhODJjNGNmMjUxOGQwOGRkZjA0ODY5MGZ8OWE4YWIwNTdhNTRhNDY2NDlmZTViNzIzOGFjNTIxOTU%3D&sdata=N1NFNHRZQXYvOUZVbE9mWXFkMGk5aDBPRGd1eGdieEVlM3A2RVVNc1NMND0%3D&ovuser=fe225eb5-6f36-4046-ba47-922eb4c5b4de%2Cbaotg10%40vpbank.com.vn" target="_blank">⬇️ Mở/Tải Bảng kê tính lãi</a>
+      </article>
+
+      <article id="n2" class="card">
+        <h2>— Nội dung 2 — <span class="chip">Báo cáo tiến độ hồ sơ</span></h2>
+        <p class="muted">Anh chị cập nhật báo cáo vào đúng <b>sheet</b> mình nhé!</p>
+        <a class="btn green" href="https://vpb-my.sharepoint.com/:x:/r/personal/baotg10_vpbank_com_vn/Documents/B%C3%A1o%20c%C3%A1o%20ti%E1%BA%BFn%20%C4%91%E1%BB%99%20h%E1%BB%93%20s%C6%A1.xlsx?d=w15c149bc330b48dfb01d7df00bd34bfd&csf=1&web=1&e=cHJmqQ" target="_blank">📄 Mở Báo cáo tiến độ hồ sơ</a>
+      </article>
+
+      <article id="n3" class="card">
+        <h2>— Nội dung 3 — <span class="chip">Bá cáo tỉ lệ hoàn thành</span></h2>
+        <a class="btn amber" href="https://vpb-my.sharepoint.com/:x:/g/personal/baotg10_vpbank_com_vn/Efe7-tAx3lJLpkMWWWYP2vwBDkB_OsAOBLZPTfohGkPDtQ?e=LSp5uv" target="_blank">📊 Mở Báo cáo tỉ lệ hoàn thành</a>
+        <div class="notice">Lưu ý: chỉ nhập số ở <b>màu Hồng</b>, định dạng <b>0,00%</b> dùng <b>dấu phẩy</b>. Dấu chấm là sai định dạng.</div>
+      </article>
+
+      <article id="n4" class="card">
+        <h2>— Nội dung 4 — <span class="chip">Tính KPI</span></h2>
+        <a class="btn violet" href="https://vpb-my.sharepoint.com/:x:/g/personal/baotg10_vpbank_com_vn/EaZIUMgwciBFqhxDR2VSpiMBsNdtLY8Z48Qd-O-n2C6BJQ?e=MUI4Oj" target="_blank">📈 Mở file Tính KPI</a>
+      </article>
+    </div>
+  </main>
+
+  <script>
+    // Force in-page navigation for quick links (avoid "blank page" in some embedded contexts)
+    (function() {
+      const links = document.querySelectorAll('a.qa[href^="#"]');
+      links.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const id = this.getAttribute('href').slice(1);
+          const target = document.getElementById(id);
+          if (target) {
+            e.preventDefault();
+            // smooth scroll with manual offset fallback
+            const y = target.getBoundingClientRect().top + window.pageYOffset - 16;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+        });
+        // keyboard access
+        link.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
