@@ -13,10 +13,11 @@
     p{margin:0 0 14px;color:#94a3b8;line-height:1.5}
     .grid{display:grid;gap:12px;grid-template-columns:1.2fr .8fr}
     @media (max-width:820px){.grid{grid-template-columns:1fr}}
-    input[type="file"], input[type="text"], input[type="number"]{
+    input[type="file"], input[type="text"], input[type="number"], textarea{
       width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
       background:rgba(0,0,0,.25);color:#e5e7eb;outline:none
     }
+    textarea{min-height:220px;resize:vertical}
     .modes{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 4px}
     .mode{
       display:flex;gap:10px;align-items:flex-start;
@@ -32,6 +33,7 @@
       background:#2563eb;color:#fff;cursor:pointer;font-weight:700
     }
     button.secondary{background:rgba(255,255,255,.08)}
+    button.danger{background:rgba(239,68,68,.20)}
     button:disabled{opacity:.55;cursor:not-allowed}
     .progress{margin-top:14px;height:10px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}
     .bar{height:100%;width:0%;background:#22c55e;transition:width .15s ease}
@@ -48,6 +50,70 @@
     @media (max-width:820px){.row2{grid-template-columns:1fr}}
     .hide{display:none !important}
     a{color:#93c5fd}
+
+    /* ===== Modal ===== */
+    .modal-overlay{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.6);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal{
+      width:min(860px, 100%);
+      background:#0f172a;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .modal header{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .modal header b{font-size:15px}
+    .modal .content{padding:14px 16px}
+    .modal .content .note{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:#cbd5e1;
+      font-size:13px;
+      line-height:1.4;
+      margin-bottom:10px;
+    }
+    .modal .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin:10px 0;
+    }
+    .modal footer{
+      padding:12px 16px;
+      border-top:1px solid rgba(255,255,255,.10);
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      font-size:13px;
+      color:#e5e7eb;
+    }
+    .pill input{margin:0}
   </style>
 </head>
 <body>
@@ -75,7 +141,7 @@
           <input type="radio" name="mode" value="single" checked />
           <div>
             <b>Chọn tách lẻ</b>
-            <div class="hint">Mỗi trang 1 file PDF.</div>
+            <div class="hint">Mỗi trang 1 file PDF. (Sẽ hỏi có muốn đặt tên từng file hay không.)</div>
           </div>
         </label>
 
@@ -138,6 +204,44 @@
     </div>
   </div>
 
+  <!-- ===== Modal đặt tên từng trang (chỉ dùng cho tách lẻ) ===== -->
+  <div class="modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true">
+    <div class="modal">
+      <header>
+        <b>Đặt tên file khi tách lẻ từng trang</b>
+        <span class="pill"><span>Trang:</span> <b id="modalPageCount">0</b></span>
+      </header>
+      <div class="content">
+        <div class="note">
+          ✅ Nếu bạn chọn đặt tên: <b>mỗi dòng = 1 file</b> (tương ứng theo <b>thứ tự trang</b> từ 1 → n).<br/>
+          📌 <b>Ghi chú:</b> Nếu là <b>file scan</b>, nhớ sắp xếp/kiểm tra đúng thứ tự trang để khớp với danh sách tên này.
+        </div>
+
+        <div class="controls">
+          <label class="pill">
+            <input type="checkbox" id="chkUseNames" />
+            <span>Bật đặt tên theo danh sách</span>
+          </label>
+          <span class="hint" style="margin:0">Nếu tắt: sẽ tự đặt tên theo dạng <b>tenPDF_p01.pdf</b>, <b>tenPDF_p02.pdf</b>…</span>
+        </div>
+
+        <textarea id="namesText" class="hide" placeholder="Dán danh sách tên tại đây...
+Ví dụ:
+CMND_NguyenVanA
+SoHoKhau_NguyenVanA
+GiayDangKyKetHon
+...
+(mỗi dòng là 1 tên)"></textarea>
+
+        <div class="hint" id="namesHint"></div>
+      </div>
+      <footer>
+        <button class="secondary" id="btnModalCancel">Huỷ</button>
+        <button id="btnModalContinue">Tiếp tục</button>
+      </footer>
+    </div>
+  </div>
+
   <!-- pdf-lib -->
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <!-- JSZip -->
@@ -162,6 +266,15 @@
     const metaEl   = $("meta");
     const logEl    = $("log");
     const barEl    = $("bar");
+
+    // Modal
+    const nameModalOverlay = $("nameModalOverlay");
+    const modalPageCount = $("modalPageCount");
+    const chkUseNames = $("chkUseNames");
+    const namesText = $("namesText");
+    const namesHint = $("namesHint");
+    const btnModalCancel = $("btnModalCancel");
+    const btnModalContinue = $("btnModalContinue");
 
     let currentFile = null;
     let currentPdfBytes = null;
@@ -193,6 +306,25 @@
     function padNumber(n, width){
       const s = String(n);
       return s.length >= width ? s : ("0".repeat(width - s.length) + s);
+    }
+
+    function sanitizeFileName(name){
+      // loại ký tự cấm trong tên file Windows/macOS
+      let s = (name || "").trim();
+      s = s.replace(/[\/\\:\*\?"<>\|]/g, " ");
+      s = s.replace(/\s+/g, " ").trim();
+      return s;
+    }
+
+    function ensureUniqueName(baseName, usedMap){
+      const key = baseName.toLowerCase();
+      if (!usedMap.has(key)){
+        usedMap.set(key, 1);
+        return baseName;
+      }
+      const n = usedMap.get(key) + 1;
+      usedMap.set(key, n);
+      return `${baseName} (${n})`;
     }
 
     // Parse "1-3,5,7-10" => [1,2,3,5,7,8,9,10]
@@ -251,11 +383,69 @@
       customBox.classList.toggle("hide", mode !== "custom");
       sizeBox.classList.toggle("hide", mode !== "size");
     }
-
-    document.querySelectorAll('input[name="mode"]').forEach(r => {
-      r.addEventListener("change", refreshModeUI);
-    });
+    document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener("change", refreshModeUI));
     refreshModeUI();
+
+    // ===== Modal logic =====
+    function openNameModal(pageCount){
+      modalPageCount.textContent = String(pageCount);
+      chkUseNames.checked = false;
+      namesText.value = "";
+      namesText.classList.add("hide");
+      namesHint.textContent = "";
+      nameModalOverlay.style.display = "flex";
+
+      // focus UX
+      setTimeout(() => btnModalContinue.focus(), 50);
+    }
+
+    function closeNameModal(){
+      nameModalOverlay.style.display = "none";
+    }
+
+    chkUseNames.addEventListener("change", () => {
+      const on = chkUseNames.checked;
+      namesText.classList.toggle("hide", !on);
+      namesHint.textContent = on
+        ? "Mẹo: Bạn có thể copy từ Excel/Word: mỗi dòng 1 tên. Nếu dòng nào để trống → file đó sẽ dùng tên mặc định."
+        : "";
+      if (on) setTimeout(() => namesText.focus(), 50);
+    });
+
+    // Trả về Promise: null = user hủy; {useNames:boolean, lines:string[]} = tiếp tục
+    function askNamesForSingleSplit(pageCount){
+      return new Promise((resolve) => {
+        openNameModal(pageCount);
+
+        const onCancel = () => {
+          cleanup();
+          closeNameModal();
+          resolve(null);
+        };
+
+        const onContinue = () => {
+          const useNames = chkUseNames.checked;
+          const linesRaw = (namesText.value || "").replace(/\r\n/g, "\n").split("\n");
+          cleanup();
+          closeNameModal();
+          resolve({ useNames, linesRaw });
+        };
+
+        const onKey = (e) => {
+          if (e.key === "Escape") onCancel();
+        };
+
+        function cleanup(){
+          btnModalCancel.removeEventListener("click", onCancel);
+          btnModalContinue.removeEventListener("click", onContinue);
+          document.removeEventListener("keydown", onKey);
+        }
+
+        btnModalCancel.addEventListener("click", onCancel);
+        btnModalContinue.addEventListener("click", onContinue);
+        document.addEventListener("keydown", onKey);
+      });
+    }
 
     fileInput.addEventListener("change", async () => {
       clearLog();
@@ -339,10 +529,31 @@
         log(`Chế độ: ${mode}`, "ok");
         log(`Tổng trang: ${pageCount}`, "ok");
 
-        // 1) Tạo danh sách nhóm trang theo mode
+        // ===== 1) Xây groups theo mode =====
         let groups = [];
 
+        // Names list for single mode (optional)
+        let singleNameLines = null;   // raw lines
+        let useSingleNames = false;
+
         if (mode === "single"){
+          // hỏi đặt tên trước khi tách
+          const modalResult = await askNamesForSingleSplit(pageCount);
+          if (!modalResult){
+            setStatus("Đã huỷ");
+            log("Bạn đã huỷ thao tác.", "err");
+            return;
+          }
+          useSingleNames = modalResult.useNames;
+          singleNameLines = modalResult.linesRaw;
+
+          if (useSingleNames){
+            log("Đang dùng danh sách tên (mỗi dòng = 1 trang).", "ok");
+            log("Ghi chú: File scan nhớ đúng thứ tự trang để khớp tên.", "ok");
+          } else {
+            log("Không đặt tên theo danh sách → dùng tên mặc định.", "ok");
+          }
+
           groups = Array.from({length: pageCount}, (_,i)=>[i+1]);
         }
 
@@ -361,7 +572,6 @@
           }
           const maxBytes = Math.floor(limitMB * 1024 * 1024);
 
-          // Build groups theo giới hạn dung lượng dựa trên size thật của PDF output
           let currentPages = [];
           let currentBytes = null;
 
@@ -376,7 +586,6 @@
             const candidatePages = currentPages.concat([p]);
             const candidateBytes = await buildPdfBytesFromPages(srcDoc, candidatePages);
 
-            // chấp nhận nếu <= limit hoặc nhóm đang rỗng (trang đơn lẻ có thể vượt)
             if (candidateBytes.length <= maxBytes || currentPages.length === 0){
               currentPages = candidatePages;
               currentBytes = candidateBytes;
@@ -388,9 +597,7 @@
                 log(`Trang ${p} riêng lẻ đã ${(candidateBytes.length/1024/1024).toFixed(2)} MB > ${limitMB} MB (bắt buộc).`, "err");
               }
             } else {
-              // chốt file trước đó
               finalizeCurrent();
-              // bắt đầu nhóm mới với trang p
               currentPages = [p];
               currentBytes = await buildPdfBytesFromPages(srcDoc, currentPages);
 
@@ -400,18 +607,16 @@
           }
           finalizeCurrent();
 
-          // nhóm ở mode size đã có bytes sẵn => convert sang format chung phía dưới
           log(`Đã chia thành ${groups.length} file theo dung lượng ~≤ ${limitMB} MB.`, "ok");
         }
 
-        // 2) Xuất file vào ZIP
+        // ===== 2) Xuất file vào ZIP =====
         setStatus("Đang tạo file & đưa vào ZIP...");
-
         let outCount = 0;
 
         if (mode === "size"){
-          // groups là [{pages,bytes}]
           const prefix = (sizePrefix.value || "").trim() || baseFromFile;
+
           for (let i = 0; i < groups.length; i++){
             const pages = groups[i].pages;
             const bytes = groups[i].bytes;
@@ -427,34 +632,59 @@
             log(`+ ${fname} (${(bytes.length/1024/1024).toFixed(2)} MB)`);
           }
         } else {
-          // single/custom: groups là [[...], [...]]
           const prefix = (mode === "custom")
             ? ((customPrefix.value || "").trim() || baseFromFile)
             : baseFromFile;
+
+          const usedNames = new Map();
 
           for (let i = 0; i < groups.length; i++){
             const pages = groups[i];
             const bytes = await buildPdfBytesFromPages(srcDoc, pages);
 
-            let fname;
-            if (mode === "single"){
-              fname = `${prefix}_${pagesLabel(pages, width)}.pdf`;
+            let fnameBase;
+
+            if (mode === "single") {
+              // pages = [pageNo]
+              const pageNo = pages[0];
+
+              if (useSingleNames) {
+                // lấy dòng tương ứng (1-based)
+                const raw = (singleNameLines && singleNameLines[pageNo - 1]) ? singleNameLines[pageNo - 1] : "";
+                const cleaned = sanitizeFileName(raw).replace(/\.pdf$/i, "").trim();
+
+                if (cleaned) {
+                  fnameBase = ensureUniqueName(cleaned, usedNames);
+                } else {
+                  fnameBase = `${prefix}_${pagesLabel(pages, width)}`;
+                }
+              } else {
+                fnameBase = `${prefix}_${pagesLabel(pages, width)}`;
+              }
+
+              const fname = `${fnameBase}.pdf`;
+              zip.file(fname, bytes);
+              outCount++;
+
+              const pct = 55 + Math.round(((i+1)/groups.length) * 30);
+              setBar(pct);
+
+              if ((i+1) % 5 === 0 || i === groups.length - 1) log(`Đã tạo ${i+1}/${groups.length} file...`);
             } else {
-              // custom
-              fname = `${prefix}_${padNumber(i+1, 2)}_${pagesLabel(pages, width)}.pdf`;
+              // custom groups
+              const fname = `${prefix}_${padNumber(i+1, 2)}_${pagesLabel(pages, width)}.pdf`;
+              zip.file(fname, bytes);
+              outCount++;
+
+              const pct = 55 + Math.round(((i+1)/groups.length) * 30);
+              setBar(pct);
+
+              if ((i+1) % 3 === 0 || i === groups.length - 1) log(`Đã tạo ${i+1}/${groups.length} file...`);
             }
-
-            zip.file(fname, bytes);
-            outCount++;
-
-            const pct = 55 + Math.round(((i+1)/groups.length) * 30);
-            setBar(pct);
-
-            if ((i+1) % 3 === 0 || i === groups.length - 1) log(`Đã tạo ${i+1}/${groups.length} file...`);
           }
         }
 
-        // 3) Nén ZIP và tải xuống
+        // ===== 3) Nén ZIP và tải xuống =====
         setStatus("Đang nén ZIP...");
         setBar(90);
 
