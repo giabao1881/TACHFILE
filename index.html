@@ -3,77 +3,51 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tách PDF thành nhiều file + ZIP (Offline trên trình duyệt)</title>
+  <title>Tách PDF: Tách lẻ | Theo yêu cầu | Theo dung lượng + ZIP</title>
   <style>
     :root { color-scheme: dark; }
-    body {
-      margin: 0; padding: 24px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: #0b1220; color: #e5e7eb;
+    body{margin:0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b1220;color:#e5e7eb}
+    .wrap{max-width:980px;margin:0 auto}
+    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;box-shadow:0 16px 36px rgba(0,0,0,.35)}
+    h1{font-size:20px;margin:0 0 8px}
+    p{margin:0 0 14px;color:#94a3b8;line-height:1.5}
+    .grid{display:grid;gap:12px;grid-template-columns:1.2fr .8fr}
+    @media (max-width:820px){.grid{grid-template-columns:1fr}}
+    input[type="file"], input[type="text"], input[type="number"]{
+      width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.25);color:#e5e7eb;outline:none
     }
-    .wrap { max-width: 860px; margin: 0 auto; }
-    .card {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 16px 36px rgba(0,0,0,.35);
+    .modes{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 4px}
+    .mode{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05)
     }
-    h1 { font-size: 20px; margin: 0 0 8px; }
-    p { margin: 0 0 14px; color: #94a3b8; line-height: 1.5; }
-    .row { display: grid; gap: 12px; grid-template-columns: 1.2fr .8fr; }
-    @media (max-width: 760px){ .row{ grid-template-columns: 1fr; } }
-    input[type="file"], input[type="text"]{
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.25);
-      color: #e5e7eb;
-      outline: none;
-    }
-    .btns { display:flex; flex-wrap: wrap; gap: 10px; align-items:center; }
+    .mode input{margin-top:3px}
+    .mode b{display:block}
+    .hint{font-size:13px;color:#94a3b8;margin-top:6px}
+    .btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
     button{
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 600;
+      padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);
+      background:#2563eb;color:#fff;cursor:pointer;font-weight:700
     }
-    button.secondary { background: rgba(255,255,255,.08); }
-    button:disabled { opacity: .55; cursor: not-allowed; }
-    .meta { margin-top: 10px; color: #cbd5e1; font-size: 14px; }
-    .hint { font-size: 13px; color: #94a3b8; margin-top: 6px; }
-    .progress {
-      margin-top: 14px;
-      height: 10px;
-      background: rgba(255,255,255,.10);
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,.10);
+    button.secondary{background:rgba(255,255,255,.08)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    .progress{margin-top:14px;height:10px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}
+    .bar{height:100%;width:0%;background:#22c55e;transition:width .15s ease}
+    .meta{margin-top:10px;color:#cbd5e1;font-size:14px}
+    .log{
+      margin-top:12px;padding:12px;border-radius:12px;background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);white-space:pre-wrap;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+      font-size:13px;color:#e5e7eb;max-height:280px;overflow:auto
     }
-    .bar { height: 100%; width: 0%; background: #22c55e; transition: width .15s ease; }
-    .log {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.10);
-      white-space: pre-wrap;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 13px;
-      color: #e5e7eb;
-      max-height: 240px;
-      overflow:auto;
-    }
-    .ok { color: #86efac; }
-    .err { color: #fca5a5; }
-    label { display:flex; gap:10px; align-items:center; user-select:none; }
-    .small { font-size: 13px; color: #cbd5e1; }
-    .footer { margin-top: 10px; font-size: 12px; color: #94a3b8; }
-    a { color: #93c5fd; }
+    .ok{color:#86efac}
+    .err{color:#fca5a5}
+    .row2{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+    @media (max-width:820px){.row2{grid-template-columns:1fr}}
+    .hide{display:none !important}
+    a{color:#93c5fd}
   </style>
 </head>
 <body>
@@ -81,38 +55,85 @@
     <div class="card">
       <h1>Tách PDF → nhiều file PDF → nén ZIP</h1>
       <p>
-        Chạy ngay trên trình duyệt. Chọn PDF, chọn trang cần tách (hoặc để mặc định là tất cả),
-        bấm “Tách & Tải ZIP”.
+        Chọn PDF, chọn chế độ tách, bấm <b>Tách & Tải ZIP</b>.
+        (Dùng <b>pdf-lib</b> + <b>JSZip</b> qua CDN.)
       </p>
 
-      <div class="row">
+      <div class="grid">
         <div>
           <input id="file" type="file" accept="application/pdf" />
-          <div class="hint">Gợi ý: File lớn (nhiều trang/scan nặng) có thể chạy chậm do giới hạn RAM của trình duyệt.</div>
+          <div class="hint">PDF scan nặng có thể chạy chậm do giới hạn RAM trình duyệt.</div>
         </div>
         <div>
-          <input id="pages" type="text" placeholder="Trang (vd: 1-3,5,7-10) | để trống = tất cả" />
-          <div class="hint">Nếu để trống, sẽ tách toàn bộ trang.</div>
+          <input id="zipname" type="text" placeholder="Tên ZIP (tuỳ chọn) - để trống = tự đặt" />
+          <div class="hint">Ví dụ: split_ho_so_001.zip</div>
         </div>
       </div>
 
-      <div style="height:12px"></div>
+      <div class="modes">
+        <label class="mode">
+          <input type="radio" name="mode" value="single" checked />
+          <div>
+            <b>Chọn tách lẻ</b>
+            <div class="hint">Mỗi trang 1 file PDF.</div>
+          </div>
+        </label>
+
+        <label class="mode">
+          <input type="radio" name="mode" value="custom" />
+          <div>
+            <b>Tách theo yêu cầu</b>
+            <div class="hint">Bạn tự nhập nhóm trang (vd: 1-3|4-6|7,9|10).</div>
+          </div>
+        </label>
+
+        <label class="mode">
+          <input type="radio" name="mode" value="size" />
+          <div>
+            <b>Tách theo dung lượng</b>
+            <div class="hint">Tự chia sao cho mỗi file ≤ X MB (trừ trang đơn lẻ quá lớn).</div>
+          </div>
+        </label>
+      </div>
+
+      <div id="customBox" class="row2 hide">
+        <div>
+          <input id="customSpec" type="text" placeholder="Nhập nhóm trang: 1-3|4-6|7,9|10" />
+          <div class="hint">
+            Dùng <b>|</b> để ngăn nhóm. Trong mỗi nhóm có thể dùng <b>,</b> và <b>-</b>.<br/>
+            Ví dụ: <b>1-5|6-10</b> sẽ ra 2 file.
+          </div>
+        </div>
+        <div>
+          <input id="customPrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: HO_SO" />
+          <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+        </div>
+      </div>
+
+      <div id="sizeBox" class="row2 hide">
+        <div>
+          <input id="maxMB" type="number" min="0.1" step="0.1" value="5" />
+          <div class="hint">Giới hạn dung lượng mỗi file (MB). Ví dụ 5 MB.</div>
+        </div>
+        <div>
+          <input id="sizePrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: PART" />
+          <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+        </div>
+      </div>
 
       <div class="btns">
         <button id="btnSplit" disabled>Tách & Tải ZIP</button>
         <button id="btnInfo" class="secondary" disabled>Xem thông tin PDF</button>
-        <span class="small" id="status"></span>
+        <span id="status" style="color:#cbd5e1;font-size:14px"></span>
       </div>
 
-      <div class="progress" aria-label="progress">
-        <div class="bar" id="bar"></div>
-      </div>
-
+      <div class="progress"><div class="bar" id="bar"></div></div>
       <div class="meta" id="meta"></div>
       <div class="log" id="log"></div>
 
-      <div class="footer">
-        Thư viện dùng: <b>pdf-lib</b> để tách trang + <b>JSZip</b> để nén ZIP. (Lấy qua CDN)
+      <div class="hint" style="margin-top:10px">
+        Lưu ý chế độ dung lượng: chương trình <b>đo kích thước file PDF tạo ra thực tế</b> để quyết định cắt,
+        nên đa số file sẽ ≤ X MB. Nếu <b>1 trang</b> đã > X MB thì bắt buộc file đó vẫn > X MB.
       </div>
     </div>
   </div>
@@ -126,7 +147,15 @@
     const $ = (id) => document.getElementById(id);
 
     const fileInput = $("file");
-    const pagesInput = $("pages");
+    const zipNameInput = $("zipname");
+
+    const customBox = $("customBox");
+    const sizeBox   = $("sizeBox");
+    const customSpec = $("customSpec");
+    const customPrefix = $("customPrefix");
+    const maxMB = $("maxMB");
+    const sizePrefix = $("sizePrefix");
+
     const btnSplit = $("btnSplit");
     const btnInfo  = $("btnInfo");
     const statusEl = $("status");
@@ -140,18 +169,13 @@
 
     function setStatus(msg){ statusEl.textContent = msg || ""; }
     function setBar(pct){ barEl.style.width = Math.max(0, Math.min(100, pct)) + "%"; }
+    function clearLog(){ logEl.textContent = ""; metaEl.textContent = ""; setBar(0); setStatus(""); }
     function log(msg, cls){
       const line = document.createElement("div");
       if (cls) line.className = cls;
       line.textContent = msg;
       logEl.appendChild(line);
       logEl.scrollTop = logEl.scrollHeight;
-    }
-    function clearLog(){
-      logEl.textContent = "";
-      metaEl.textContent = "";
-      setBar(0);
-      setStatus("");
     }
 
     function downloadBlob(blob, filename){
@@ -165,10 +189,7 @@
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     }
 
-    function getBaseName(name){
-      return (name || "file").replace(/\.[^.]+$/,"");
-    }
-
+    function getBaseName(name){ return (name || "file").replace(/\.[^.]+$/,""); }
     function padNumber(n, width){
       const s = String(n);
       return s.length >= width ? s : ("0".repeat(width - s.length) + s);
@@ -177,9 +198,7 @@
     // Parse "1-3,5,7-10" => [1,2,3,5,7,8,9,10]
     function parsePageRanges(text, maxPage){
       const t = (text || "").trim();
-      if (!t) {
-        return Array.from({length: maxPage}, (_,i)=>i+1);
-      }
+      if (!t) return [];
       const parts = t.split(",").map(x=>x.trim()).filter(Boolean);
       const out = new Set();
 
@@ -201,6 +220,19 @@
       return Array.from(out).sort((x,y)=>x-y);
     }
 
+    // "1-3|4-6|7,9|10" => [[1,2,3],[4,5,6],[7,9],[10]]
+    function parseGroups(spec, maxPage){
+      const s = (spec || "").trim();
+      if (!s) return [];
+      const rawGroups = s.split("|").map(x=>x.trim()).filter(Boolean);
+      const groups = [];
+      for (const g of rawGroups){
+        const pages = parsePageRanges(g, maxPage);
+        if (pages.length) groups.push(pages);
+      }
+      return groups;
+    }
+
     async function loadPdfFromFile(file){
       const buf = await file.arrayBuffer();
       currentPdfBytes = new Uint8Array(buf);
@@ -208,6 +240,22 @@
       currentPageCount = pdfDoc.getPageCount();
       return pdfDoc;
     }
+
+    function getMode(){
+      const el = document.querySelector('input[name="mode"]:checked');
+      return el ? el.value : "single";
+    }
+
+    function refreshModeUI(){
+      const mode = getMode();
+      customBox.classList.toggle("hide", mode !== "custom");
+      sizeBox.classList.toggle("hide", mode !== "size");
+    }
+
+    document.querySelectorAll('input[name="mode"]').forEach(r => {
+      r.addEventListener("change", refreshModeUI);
+    });
+    refreshModeUI();
 
     fileInput.addEventListener("change", async () => {
       clearLog();
@@ -217,21 +265,17 @@
       btnSplit.disabled = true;
       btnInfo.disabled = true;
 
-      if (!currentFile){
-        setStatus("");
-        return;
-      }
+      if (!currentFile){ return; }
 
       setStatus("Đang đọc PDF...");
       try{
-        const pdfDoc = await loadPdfFromFile(currentFile);
+        await loadPdfFromFile(currentFile);
         setStatus("Sẵn sàng");
         btnSplit.disabled = false;
         btnInfo.disabled = false;
 
         metaEl.textContent =
           `Tên file: ${currentFile.name} | Dung lượng: ${(currentFile.size/1024/1024).toFixed(2)} MB | Số trang: ${currentPageCount}`;
-
         log("Đã tải PDF thành công.", "ok");
       } catch (e){
         setStatus("Lỗi đọc PDF");
@@ -245,17 +289,33 @@
       clearLog();
       setStatus("Đang lấy thông tin...");
       try{
-        const pdfDoc = await loadPdfFromFile(currentFile);
-        const count = pdfDoc.getPageCount();
+        await loadPdfFromFile(currentFile);
         setStatus("Xong");
-        metaEl.textContent = `Số trang: ${count}`;
-        log(`PDF có ${count} trang.`, "ok");
-        log(`Bạn có thể nhập ví dụ: 1-3,5,7-${count}`);
+        metaEl.textContent = `Số trang: ${currentPageCount}`;
+        log(`PDF có ${currentPageCount} trang.`, "ok");
+        log(`Ví dụ theo yêu cầu: 1-3|4-6|7,9|10`);
+        log(`Ví dụ theo dung lượng: nhập 5 (MB) để chia mỗi file <= 5MB.`);
       } catch (e){
         setStatus("Lỗi");
         log(String(e), "err");
       }
     });
+
+    async function buildPdfBytesFromPages(srcDoc, pages1Based){
+      const newDoc = await PDFLib.PDFDocument.create();
+      const idx0 = pages1Based.map(p => p-1);
+      const copied = await newDoc.copyPages(srcDoc, idx0);
+      copied.forEach(pg => newDoc.addPage(pg));
+      const bytes = await newDoc.save();
+      return bytes;
+    }
+
+    function pagesLabel(pages, width){
+      if (!pages.length) return "p";
+      const a = padNumber(pages[0], width);
+      const b = padNumber(pages[pages.length-1], width);
+      return (pages.length === 1) ? `p${a}` : `p${a}-${b}`;
+    }
 
     btnSplit.addEventListener("click", async () => {
       if (!currentFile || !currentPdfBytes) return;
@@ -265,55 +325,149 @@
       btnInfo.disabled = true;
 
       try{
+        const mode = getMode();
         setStatus("Đang mở PDF...");
         const srcDoc = await PDFLib.PDFDocument.load(currentPdfBytes, { ignoreEncryption: false });
         const pageCount = srcDoc.getPageCount();
+        const width = String(pageCount).length;
 
-        const selectedPages = parsePageRanges(pagesInput.value, pageCount);
-        if (!selectedPages.length){
-          throw new Error("Không có trang hợp lệ để tách. Hãy kiểm tra ô 'Trang'.");
-        }
-
-        const base = getBaseName(currentFile.name);
+        const baseFromFile = getBaseName(currentFile.name);
         const zip = new JSZip();
 
-        const width = String(pageCount).length; // để đặt tên p01, p02... theo độ dài
+        const zipName = (zipNameInput.value || "").trim() || `${baseFromFile}_split.zip`;
+
+        log(`Chế độ: ${mode}`, "ok");
         log(`Tổng trang: ${pageCount}`, "ok");
-        log(`Sẽ tách ${selectedPages.length} trang: ${selectedPages.join(", ")}`);
 
-        setStatus("Đang tách trang...");
-        for (let idx = 0; idx < selectedPages.length; idx++){
-          const pageNo = selectedPages[idx]; // 1-based
-          const newDoc = await PDFLib.PDFDocument.create();
-          const [copied] = await newDoc.copyPages(srcDoc, [pageNo - 1]);
-          newDoc.addPage(copied);
+        // 1) Tạo danh sách nhóm trang theo mode
+        let groups = [];
 
-          const bytes = await newDoc.save();
-          const fname = `${base}_p${padNumber(pageNo, width)}.pdf`;
-          zip.file(fname, bytes);
+        if (mode === "single"){
+          groups = Array.from({length: pageCount}, (_,i)=>[i+1]);
+        }
 
-          const pct = Math.round(((idx + 1) / selectedPages.length) * 85);
-          setBar(pct);
-          if ((idx+1) % 3 === 0 || idx === selectedPages.length - 1) {
-            log(`Đã tách: ${fname}`);
+        if (mode === "custom"){
+          const spec = (customSpec.value || "").trim();
+          groups = parseGroups(spec, pageCount);
+          if (!groups.length){
+            throw new Error("Chế độ 'theo yêu cầu' cần nhập nhóm trang. Ví dụ: 1-3|4-6|7,9|10");
           }
         }
 
+        if (mode === "size"){
+          const limitMB = Number(maxMB.value);
+          if (!Number.isFinite(limitMB) || limitMB <= 0) {
+            throw new Error("Dung lượng (MB) không hợp lệ.");
+          }
+          const maxBytes = Math.floor(limitMB * 1024 * 1024);
+
+          // Build groups theo giới hạn dung lượng dựa trên size thật của PDF output
+          let currentPages = [];
+          let currentBytes = null;
+
+          const finalizeCurrent = () => {
+            if (currentPages.length && currentBytes) {
+              groups.push({ pages: currentPages.slice(), bytes: currentBytes });
+            }
+          };
+
+          setStatus("Đang chia nhóm theo dung lượng...");
+          for (let p = 1; p <= pageCount; p++){
+            const candidatePages = currentPages.concat([p]);
+            const candidateBytes = await buildPdfBytesFromPages(srcDoc, candidatePages);
+
+            // chấp nhận nếu <= limit hoặc nhóm đang rỗng (trang đơn lẻ có thể vượt)
+            if (candidateBytes.length <= maxBytes || currentPages.length === 0){
+              currentPages = candidatePages;
+              currentBytes = candidateBytes;
+
+              const pct = Math.round((p / pageCount) * 55);
+              setBar(pct);
+
+              if (candidateBytes.length > maxBytes && currentPages.length === 1){
+                log(`Trang ${p} riêng lẻ đã ${(candidateBytes.length/1024/1024).toFixed(2)} MB > ${limitMB} MB (bắt buộc).`, "err");
+              }
+            } else {
+              // chốt file trước đó
+              finalizeCurrent();
+              // bắt đầu nhóm mới với trang p
+              currentPages = [p];
+              currentBytes = await buildPdfBytesFromPages(srcDoc, currentPages);
+
+              const pct = Math.round((p / pageCount) * 55);
+              setBar(pct);
+            }
+          }
+          finalizeCurrent();
+
+          // nhóm ở mode size đã có bytes sẵn => convert sang format chung phía dưới
+          log(`Đã chia thành ${groups.length} file theo dung lượng ~≤ ${limitMB} MB.`, "ok");
+        }
+
+        // 2) Xuất file vào ZIP
+        setStatus("Đang tạo file & đưa vào ZIP...");
+
+        let outCount = 0;
+
+        if (mode === "size"){
+          // groups là [{pages,bytes}]
+          const prefix = (sizePrefix.value || "").trim() || baseFromFile;
+          for (let i = 0; i < groups.length; i++){
+            const pages = groups[i].pages;
+            const bytes = groups[i].bytes;
+            const label = pagesLabel(pages, width);
+            const fname = `${prefix}_${padNumber(i+1, 2)}_${label}.pdf`;
+
+            zip.file(fname, bytes);
+            outCount++;
+
+            const pct = 55 + Math.round(((i+1)/groups.length) * 30);
+            setBar(pct);
+
+            log(`+ ${fname} (${(bytes.length/1024/1024).toFixed(2)} MB)`);
+          }
+        } else {
+          // single/custom: groups là [[...], [...]]
+          const prefix = (mode === "custom")
+            ? ((customPrefix.value || "").trim() || baseFromFile)
+            : baseFromFile;
+
+          for (let i = 0; i < groups.length; i++){
+            const pages = groups[i];
+            const bytes = await buildPdfBytesFromPages(srcDoc, pages);
+
+            let fname;
+            if (mode === "single"){
+              fname = `${prefix}_${pagesLabel(pages, width)}.pdf`;
+            } else {
+              // custom
+              fname = `${prefix}_${padNumber(i+1, 2)}_${pagesLabel(pages, width)}.pdf`;
+            }
+
+            zip.file(fname, bytes);
+            outCount++;
+
+            const pct = 55 + Math.round(((i+1)/groups.length) * 30);
+            setBar(pct);
+
+            if ((i+1) % 3 === 0 || i === groups.length - 1) log(`Đã tạo ${i+1}/${groups.length} file...`);
+          }
+        }
+
+        // 3) Nén ZIP và tải xuống
         setStatus("Đang nén ZIP...");
-        setBar(92);
+        setBar(90);
 
         const zipBlob = await zip.generateAsync({ type: "blob" }, (meta) => {
-          // meta.percent: 0..100 trong giai đoạn nén
-          const pct = 92 + Math.round((meta.percent / 100) * 8);
+          const pct = 90 + Math.round((meta.percent/100)*10);
           setBar(pct);
         });
 
-        const zipName = `${base}_split_${selectedPages.length}files.zip`;
         downloadBlob(zipBlob, zipName);
-
         setStatus("Hoàn tất ✅");
         setBar(100);
-        log(`Đã tạo ZIP: ${zipName}`, "ok");
+        log(`Đã tạo ${outCount} file PDF và nén vào: ${zipName}`, "ok");
+
       } catch (e){
         setStatus("Có lỗi ❌");
         log("Lỗi:", "err");
@@ -326,4 +480,3 @@
   </script>
 </body>
 </html>
-
