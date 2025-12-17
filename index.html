@@ -3,74 +3,281 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tách PDF: Tách lẻ | Theo yêu cầu | Theo dung lượng + ZIP</title>
+  <title>baotg10 | Tool tách PDF → ZIP</title>
+
   <style>
-    :root { color-scheme: dark; }
-    body{margin:0;padding:24px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0b1220;color:#e5e7eb}
-    .wrap{max-width:980px;margin:0 auto}
-    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;box-shadow:0 16px 36px rgba(0,0,0,.35)}
-    h1{font-size:20px;margin:0 0 8px}
-    p{margin:0 0 14px;color:#94a3b8;line-height:1.5}
-    .grid{display:grid;gap:12px;grid-template-columns:1.2fr .8fr}
-    @media (max-width:820px){.grid{grid-template-columns:1fr}}
+    :root{
+      color-scheme: dark;
+      --bg0:#070b14;
+      --bg1:#0b1220;
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.12);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --muted2:#cbd5e1;
+      --p1:#3b82f6;
+      --p2:#8b5cf6;
+      --p3:#ec4899;
+      --ok:#22c55e;
+      --err:#ef4444;
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --r:18px;
+      --r2:14px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; padding:28px;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(59,130,246,.25), transparent 60%),
+        radial-gradient(800px 520px at 90% 10%, rgba(236,72,153,.22), transparent 55%),
+        radial-gradient(900px 650px at 50% 100%, rgba(139,92,246,.22), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+
+    .wrap{max-width:1040px; margin:0 auto}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, rgba(59,130,246,.35), rgba(139,92,246,.25), rgba(236,72,153,.25));
+      filter: blur(22px);
+      opacity:.25;
+      pointer-events:none;
+    }
+    .inner{position:relative; padding:18px}
+
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; padding:18px 18px 6px 18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(59,130,246,.95), rgba(139,92,246,.85) 55%, rgba(236,72,153,.85));
+      box-shadow: 0 14px 30px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .title{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    h1{
+      font-size:18px; margin:0;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      font-size:13px; color:var(--muted);
+    }
+
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size:13px;
+      color:var(--muted2);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Intro */
+    .intro{
+      margin:10px 18px 18px;
+      border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
+      padding:16px;
+      backdrop-filter: blur(12px);
+    }
+    .intro h2{
+      margin:0 0 8px; font-size:15px;
+    }
+    .intro p{margin:0 0 10px; color:var(--muted); line-height:1.6; font-size:13.5px}
+    .intro .grid{
+      display:grid; gap:10px; grid-template-columns: 1.1fr .9fr;
+    }
+    @media (max-width:900px){ .intro .grid{grid-template-columns:1fr} }
+    .feature{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      padding:12px; border-radius: var(--r2);
+    }
+    .feature b{display:block; font-size:13.5px; margin-bottom:4px}
+    .feature span{display:block; font-size:12.8px; color:var(--muted); line-height:1.5}
+    .note{
+      margin-top:10px;
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px; border-radius: var(--r2);
+      border:1px solid rgba(34,197,94,.25);
+      background: rgba(34,197,94,.08);
+      color: #d1fae5;
+      font-size:12.8px;
+      line-height:1.5;
+    }
+
+    /* Form area */
+    .section{
+      margin:0 18px 18px;
+      border-radius: var(--r);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding:16px;
+      backdrop-filter: blur(12px);
+    }
+    .row{
+      display:grid; gap:12px; grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width:820px){ .row{grid-template-columns:1fr} }
     input[type="file"], input[type="text"], input[type="number"], textarea{
-      width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.25);color:#e5e7eb;outline:none
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color:var(--text);
+      outline:none;
     }
-    textarea{min-height:220px;resize:vertical}
-    .modes{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 4px}
+    input:focus, textarea:focus{
+      border-color: rgba(59,130,246,.55);
+      box-shadow: 0 0 0 4px rgba(59,130,246,.15);
+    }
+    textarea{min-height:220px; resize:vertical}
+
+    .hint{font-size:12.8px; color:var(--muted); margin-top:6px; line-height:1.45}
+
+    /* Mode cards */
+    .modes{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px}
     .mode{
-      display:flex;gap:10px;align-items:flex-start;
-      padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.05)
+      flex: 1 1 260px;
+      display:flex; gap:10px; align-items:flex-start;
+      padding:12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
     }
-    .mode input{margin-top:3px}
-    .mode b{display:block}
-    .hint{font-size:13px;color:#94a3b8;margin-top:6px}
-    .btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+    .mode:hover{
+      transform: translateY(-1px);
+      border-color: rgba(59,130,246,.35);
+      background: rgba(255,255,255,.06);
+    }
+    .mode input{margin-top:4px; transform: scale(1.15)}
+    .mode b{display:block; font-size:14px}
+    .mode .sub{font-size:12.8px; color:var(--muted); line-height:1.45}
+
+    .row2{display:grid; gap:12px; grid-template-columns:1fr 1fr; margin-top:12px}
+    @media (max-width:820px){ .row2{grid-template-columns:1fr} }
+    .hide{display:none !important}
+
+    /* Buttons */
+    .btns{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:12px}
     button{
-      padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);
-      background:#2563eb;color:#fff;cursor:pointer;font-weight:700
+      padding:11px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(139,92,246,.85));
+      color:#fff; cursor:pointer;
+      font-weight:800;
+      letter-spacing:.2px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      transition: transform .12s ease, filter .12s ease;
     }
-    button.secondary{background:rgba(255,255,255,.08)}
-    button.danger{background:rgba(239,68,68,.20)}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .progress{margin-top:14px;height:10px;background:rgba(255,255,255,.10);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10)}
-    .bar{height:100%;width:0%;background:#22c55e;transition:width .15s ease}
-    .meta{margin-top:10px;color:#cbd5e1;font-size:14px}
+    button:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+    button:active{ transform: translateY(0px); filter: brightness(.98); }
+    button.secondary{
+      background: rgba(255,255,255,.08);
+      box-shadow:none;
+      font-weight:700;
+    }
+    button:disabled{ opacity:.55; cursor:not-allowed; transform:none; filter:none; }
+
+    .status{color:var(--muted2); font-size:13.5px}
+    .progress{
+      margin-top:14px;
+      height: 12px;
+      background: rgba(255,255,255,.10);
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .bar{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(34,197,94,.95), rgba(59,130,246,.85));
+      transition: width .15s ease;
+    }
+    .meta{margin-top:10px; color:var(--muted2); font-size:13.5px}
     .log{
-      margin-top:12px;padding:12px;border-radius:12px;background:rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.10);white-space:pre-wrap;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
-      font-size:13px;color:#e5e7eb;max-height:280px;overflow:auto
+      margin-top:12px;
+      padding:12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      color: var(--text);
+      max-height: 280px;
+      overflow:auto;
     }
     .ok{color:#86efac}
     .err{color:#fca5a5}
-    .row2{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-    @media (max-width:820px){.row2{grid-template-columns:1fr}}
-    .hide{display:none !important}
-    a{color:#93c5fd}
+
+    /* Footer */
+    .footer{
+      padding:14px 18px 18px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:rgba(148,163,184,.9);
+      font-size:12.5px;
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+    }
+    .footer b{color:#e5e7eb}
+    .footer .right{opacity:.9}
 
     /* ===== Modal ===== */
     .modal-overlay{
       position:fixed; inset:0;
-      background:rgba(0,0,0,.6);
+      background: rgba(2,6,23,.75);
       display:none;
       align-items:center;
       justify-content:center;
       padding:18px;
       z-index:9999;
+      backdrop-filter: blur(10px);
     }
     .modal{
-      width:min(860px, 100%);
-      background:#0f172a;
+      width:min(920px, 100%);
+      background: linear-gradient(180deg, rgba(15,23,42,.92), rgba(2,6,23,.92));
       border:1px solid rgba(255,255,255,.14);
-      border-radius:16px;
-      box-shadow:0 20px 60px rgba(0,0,0,.55);
+      border-radius: 22px;
+      box-shadow: 0 26px 80px rgba(0,0,0,.60);
       overflow:hidden;
+      position:relative;
     }
+    .modal::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, rgba(59,130,246,.30), rgba(139,92,246,.22), rgba(236,72,153,.22));
+      filter: blur(26px);
+      opacity:.35;
+      pointer-events:none;
+    }
+    .modal .m-inner{position:relative}
     .modal header{
-      padding:14px 16px;
+      padding:16px 18px;
       border-bottom:1px solid rgba(255,255,255,.10);
       display:flex;
       justify-content:space-between;
@@ -78,167 +285,270 @@
       align-items:center;
     }
     .modal header b{font-size:15px}
-    .modal .content{padding:14px 16px}
-    .modal .content .note{
-      padding:10px 12px;
-      border-radius:12px;
+    .modal .content{padding:16px 18px}
+    .modal .callout{
+      padding:12px 14px;
+      border-radius: 16px;
       border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.05);
-      color:#cbd5e1;
+      background: rgba(255,255,255,.06);
+      color: var(--muted2);
       font-size:13px;
-      line-height:1.4;
-      margin-bottom:10px;
-    }
-    .modal .controls{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin:10px 0;
+      line-height:1.5;
+      margin-bottom:12px;
     }
     .modal footer{
-      padding:12px 16px;
+      padding:14px 18px;
       border-top:1px solid rgba(255,255,255,.10);
       display:flex;
       justify-content:flex-end;
       gap:10px;
       flex-wrap:wrap;
     }
-    .pill{
-      display:inline-flex; gap:8px; align-items:center;
-      padding:8px 10px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      font-size:13px;
-      color:#e5e7eb;
+
+    /* BIG toggle */
+    .toggle-row{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 14px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      margin-bottom:12px;
     }
-    .pill input{margin:0}
+    .toggle-text{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .toggle-text b{font-size:14px}
+    .toggle-text span{font-size:12.8px; color:var(--muted); line-height:1.35}
+
+    .switch{
+      position:relative;
+      width:64px; height:36px;
+      flex: 0 0 auto;
+    }
+    .switch input{display:none}
+    .slider{
+      position:absolute; inset:0;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      transition: .18s ease;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.18);
+    }
+    .slider::before{
+      content:"";
+      position:absolute;
+      width:28px; height:28px;
+      left:4px; top:3px;
+      border-radius:999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.72));
+      transition: .18s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.38);
+    }
+    .switch input:checked + .slider{
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(139,92,246,.85));
+      border-color: rgba(59,130,246,.45);
+    }
+    .switch input:checked + .slider::before{
+      transform: translateX(28px);
+    }
+
+    .kbd{
+      padding:6px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size:12.5px;
+      color: var(--muted2);
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>Tách PDF → nhiều file PDF → nén ZIP</h1>
-      <p>
-        Chọn PDF, chọn chế độ tách, bấm <b>Tách & Tải ZIP</b>.
-        (Dùng <b>pdf-lib</b> + <b>JSZip</b> qua CDN.)
-      </p>
-
-      <div class="grid">
-        <div>
-          <input id="file" type="file" accept="application/pdf" />
-          <div class="hint">PDF scan nặng có thể chạy chậm do giới hạn RAM trình duyệt.</div>
-        </div>
-        <div>
-          <input id="zipname" type="text" placeholder="Tên ZIP (tuỳ chọn) - để trống = tự đặt" />
-          <div class="hint">Ví dụ: split_ho_so_001.zip</div>
-        </div>
-      </div>
-
-      <div class="modes">
-        <label class="mode">
-          <input type="radio" name="mode" value="single" checked />
-          <div>
-            <b>Chọn tách lẻ</b>
-            <div class="hint">Mỗi trang 1 file PDF. (Sẽ hỏi có muốn đặt tên từng file hay không.)</div>
-          </div>
-        </label>
-
-        <label class="mode">
-          <input type="radio" name="mode" value="custom" />
-          <div>
-            <b>Tách theo yêu cầu</b>
-            <div class="hint">Bạn tự nhập nhóm trang (vd: 1-3|4-6|7,9|10).</div>
-          </div>
-        </label>
-
-        <label class="mode">
-          <input type="radio" name="mode" value="size" />
-          <div>
-            <b>Tách theo dung lượng</b>
-            <div class="hint">Tự chia sao cho mỗi file ≤ X MB (trừ trang đơn lẻ quá lớn).</div>
-          </div>
-        </label>
-      </div>
-
-      <div id="customBox" class="row2 hide">
-        <div>
-          <input id="customSpec" type="text" placeholder="Nhập nhóm trang: 1-3|4-6|7,9|10" />
-          <div class="hint">
-            Dùng <b>|</b> để ngăn nhóm. Trong mỗi nhóm có thể dùng <b>,</b> và <b>-</b>.<br/>
-            Ví dụ: <b>1-5|6-10</b> sẽ ra 2 file.
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="title">
+            <h1>Tool tách PDF → ZIP</h1>
+            <div class="subtitle">Tách lẻ • Tách theo nhóm • Tách theo dung lượng — chạy trực tiếp trên trình duyệt</div>
           </div>
         </div>
-        <div>
-          <input id="customPrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: HO_SO" />
-          <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+        <div class="pill">
+          <span>Powered by</span> <b>baotg10</b>
         </div>
       </div>
 
-      <div id="sizeBox" class="row2 hide">
-        <div>
-          <input id="maxMB" type="number" min="0.1" step="0.1" value="5" />
-          <div class="hint">Giới hạn dung lượng mỗi file (MB). Ví dụ 5 MB.</div>
+      <!-- GIỚI THIỆU TOOL -->
+      <div class="intro">
+        <h2>Giới thiệu</h2>
+        <div class="grid">
+          <div class="feature">
+            <b>Tool này làm được gì?</b>
+            <span>
+              Chọn 1 file PDF → tách ra nhiều file PDF theo 3 kiểu (tách lẻ từng trang, tách theo nhóm trang bạn nhập, hoặc tự chia theo dung lượng),
+              sau đó nén tất cả vào 1 file ZIP để tải về.
+            </span>
+          </div>
+          <div class="feature">
+            <b>Chạy ở đâu? Có an toàn không?</b>
+            <span>
+              Tool chạy trên trình duyệt (Chrome/Edge). Dữ liệu xử lý ngay trên máy bạn.
+              Lưu ý: vì dùng thư viện tải qua CDN nên cần Internet lúc mở trang.
+            </span>
+          </div>
+
+          <div class="feature">
+            <b>Cách dùng nhanh</b>
+            <span>
+              1) Chọn PDF → 2) Chọn chế độ tách → 3) (nếu cần) nhập nhóm/dung lượng → 4) Bấm “Tách & Tải ZIP”.
+            </span>
+          </div>
+          <div class="feature">
+            <b>Lưu ý file scan</b>
+            <span>
+              Nếu PDF là bản scan, cần đảm bảo thứ tự trang đúng. Khi “tách lẻ + đặt tên”, mỗi dòng tên sẽ ứng với trang 1 → n theo đúng thứ tự.
+            </span>
+          </div>
         </div>
-        <div>
-          <input id="sizePrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: PART" />
-          <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+
+        <div class="note">
+          ✅ Mẹo: Nếu bạn muốn đặt tên nhanh theo danh sách (mỗi dòng 1 tên), hãy chuẩn bị sẵn trong Excel/Word rồi copy dán vào.
         </div>
       </div>
 
-      <div class="btns">
-        <button id="btnSplit" disabled>Tách & Tải ZIP</button>
-        <button id="btnInfo" class="secondary" disabled>Xem thông tin PDF</button>
-        <span id="status" style="color:#cbd5e1;font-size:14px"></span>
+      <div class="inner">
+        <div class="section">
+          <div class="row">
+            <div>
+              <input id="file" type="file" accept="application/pdf" />
+              <div class="hint">PDF scan nặng có thể chạy chậm do giới hạn RAM trình duyệt.</div>
+            </div>
+            <div>
+              <input id="zipname" type="text" placeholder="Tên ZIP (tuỳ chọn) - để trống = tự đặt" />
+              <div class="hint">Ví dụ: split_ho_so_001.zip</div>
+            </div>
+          </div>
+
+          <div class="modes">
+            <label class="mode">
+              <input type="radio" name="mode" value="single" checked />
+              <div>
+                <b>Tách lẻ từng trang</b>
+                <div class="sub">Mỗi trang = 1 file PDF. Khi bấm tách sẽ hỏi có muốn đặt tên theo danh sách không.</div>
+              </div>
+            </label>
+
+            <label class="mode">
+              <input type="radio" name="mode" value="custom" />
+              <div>
+                <b>Tách theo yêu cầu</b>
+                <div class="sub">Bạn nhập nhóm trang, ví dụ: <b>1-3|4-6|7,9|10</b>.</div>
+              </div>
+            </label>
+
+            <label class="mode">
+              <input type="radio" name="mode" value="size" />
+              <div>
+                <b>Tách theo dung lượng</b>
+                <div class="sub">Tự chia sao cho mỗi file ≤ X MB (trừ trang đơn lẻ quá lớn).</div>
+              </div>
+            </label>
+          </div>
+
+          <div id="customBox" class="row2 hide">
+            <div>
+              <input id="customSpec" type="text" placeholder="Nhập nhóm trang: 1-3|4-6|7,9|10" />
+              <div class="hint">
+                Dùng <b>|</b> để ngăn nhóm. Trong mỗi nhóm có thể dùng <b>,</b> và <b>-</b>.
+                Ví dụ: <b>1-5|6-10</b> → ra 2 file.
+              </div>
+            </div>
+            <div>
+              <input id="customPrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: HO_SO" />
+              <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+            </div>
+          </div>
+
+          <div id="sizeBox" class="row2 hide">
+            <div>
+              <input id="maxMB" type="number" min="0.1" step="0.1" value="5" />
+              <div class="hint">Giới hạn dung lượng mỗi file (MB). Ví dụ 5 MB.</div>
+            </div>
+            <div>
+              <input id="sizePrefix" type="text" placeholder="Tiền tố tên file (tuỳ chọn) - vd: PART" />
+              <div class="hint">Nếu để trống sẽ dùng tên PDF gốc.</div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button id="btnSplit" disabled>Tách & Tải ZIP</button>
+            <button id="btnInfo" class="secondary" disabled>Xem thông tin PDF</button>
+            <span id="status" class="status"></span>
+          </div>
+
+          <div class="progress"><div class="bar" id="bar"></div></div>
+          <div class="meta" id="meta"></div>
+          <div class="log" id="log"></div>
+
+          <div class="hint" style="margin-top:10px">
+            Lưu ý chế độ dung lượng: tool <b>đo kích thước file PDF tạo ra thực tế</b> để quyết định cắt.
+            Nếu <b>1 trang</b> đã > X MB thì file đó vẫn > X MB (không thể nhỏ hơn).
+          </div>
+        </div>
       </div>
 
-      <div class="progress"><div class="bar" id="bar"></div></div>
-      <div class="meta" id="meta"></div>
-      <div class="log" id="log"></div>
-
-      <div class="hint" style="margin-top:10px">
-        Lưu ý chế độ dung lượng: chương trình <b>đo kích thước file PDF tạo ra thực tế</b> để quyết định cắt,
-        nên đa số file sẽ ≤ X MB. Nếu <b>1 trang</b> đã > X MB thì bắt buộc file đó vẫn > X MB.
+      <div class="footer">
+        <div><b>© baotg10</b> — Tool tách PDF & ZIP</div>
+        <div class="right">Made for fast workflow • 2025</div>
       </div>
     </div>
   </div>
 
-  <!-- ===== Modal đặt tên từng trang (chỉ dùng cho tách lẻ) ===== -->
+  <!-- ===== Modal đặt tên (chỉ cho tách lẻ) ===== -->
   <div class="modal-overlay" id="nameModalOverlay" role="dialog" aria-modal="true">
     <div class="modal">
-      <header>
-        <b>Đặt tên file khi tách lẻ từng trang</b>
-        <span class="pill"><span>Trang:</span> <b id="modalPageCount">0</b></span>
-      </header>
-      <div class="content">
-        <div class="note">
-          ✅ Nếu bạn chọn đặt tên: <b>mỗi dòng = 1 file</b> (tương ứng theo <b>thứ tự trang</b> từ 1 → n).<br/>
-          📌 <b>Ghi chú:</b> Nếu là <b>file scan</b>, nhớ sắp xếp/kiểm tra đúng thứ tự trang để khớp với danh sách tên này.
-        </div>
+      <div class="m-inner">
+        <header>
+          <b>Đặt tên file khi tách lẻ từng trang</b>
+          <div class="pill"><span>Trang:</span> <b id="modalPageCount">0</b></div>
+        </header>
 
-        <div class="controls">
-          <label class="pill">
-            <input type="checkbox" id="chkUseNames" />
-            <span>Bật đặt tên theo danh sách</span>
-          </label>
-          <span class="hint" style="margin:0">Nếu tắt: sẽ tự đặt tên theo dạng <b>tenPDF_p01.pdf</b>, <b>tenPDF_p02.pdf</b>…</span>
-        </div>
+        <div class="content">
+          <div class="callout">
+            ✅ Nếu bạn bật đặt tên: <b>mỗi dòng = 1 file</b> (tương ứng theo <b>thứ tự trang</b> từ 1 → n).<br/>
+            📌 <b>Ghi chú:</b> Nếu là <b>file scan</b>, nhớ sắp xếp/kiểm tra đúng thứ tự trang để khớp danh sách tên này.
+          </div>
 
-        <textarea id="namesText" class="hide" placeholder="Dán danh sách tên tại đây...
+          <div class="toggle-row">
+            <div class="toggle-text">
+              <b>Bật đặt tên theo danh sách</b>
+              <span>Nếu tắt: tự đặt tên theo dạng <b>tenPDF_p01.pdf</b>, <b>tenPDF_p02.pdf</b>...</span>
+            </div>
+
+            <label class="switch" title="Bật/Tắt đặt tên theo danh sách">
+              <input type="checkbox" id="chkUseNames" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <textarea id="namesText" class="hide" placeholder="Dán danh sách tên tại đây (mỗi dòng 1 tên)...
 Ví dụ:
 CMND_NguyenVanA
 SoHoKhau_NguyenVanA
-GiayDangKyKetHon
-...
-(mỗi dòng là 1 tên)"></textarea>
+GiayDangKyKetHon"></textarea>
 
-        <div class="hint" id="namesHint"></div>
+          <div class="hint" id="namesHint"></div>
+          <div class="hint" style="margin-top:8px">
+            Phím nhanh: <span class="kbd">Esc</span> để huỷ.
+          </div>
+        </div>
+
+        <footer>
+          <button class="secondary" id="btnModalCancel">Huỷ</button>
+          <button id="btnModalContinue">Tiếp tục</button>
+        </footer>
       </div>
-      <footer>
-        <button class="secondary" id="btnModalCancel">Huỷ</button>
-        <button id="btnModalContinue">Tiếp tục</button>
-      </footer>
     </div>
   </div>
 
@@ -309,7 +619,6 @@ GiayDangKyKetHon
     }
 
     function sanitizeFileName(name){
-      // loại ký tự cấm trong tên file Windows/macOS
       let s = (name || "").trim();
       s = s.replace(/[\/\\:\*\?"<>\|]/g, " ");
       s = s.replace(/\s+/g, " ").trim();
@@ -327,7 +636,6 @@ GiayDangKyKetHon
       return `${baseName} (${n})`;
     }
 
-    // Parse "1-3,5,7-10" => [1,2,3,5,7,8,9,10]
     function parsePageRanges(text, maxPage){
       const t = (text || "").trim();
       if (!t) return [];
@@ -352,7 +660,6 @@ GiayDangKyKetHon
       return Array.from(out).sort((x,y)=>x-y);
     }
 
-    // "1-3|4-6|7,9|10" => [[1,2,3],[4,5,6],[7,9],[10]]
     function parseGroups(spec, maxPage){
       const s = (spec || "").trim();
       if (!s) return [];
@@ -394,9 +701,7 @@ GiayDangKyKetHon
       namesText.classList.add("hide");
       namesHint.textContent = "";
       nameModalOverlay.style.display = "flex";
-
-      // focus UX
-      setTimeout(() => btnModalContinue.focus(), 50);
+      setTimeout(() => btnModalContinue.focus(), 30);
     }
 
     function closeNameModal(){
@@ -407,12 +712,11 @@ GiayDangKyKetHon
       const on = chkUseNames.checked;
       namesText.classList.toggle("hide", !on);
       namesHint.textContent = on
-        ? "Mẹo: Bạn có thể copy từ Excel/Word: mỗi dòng 1 tên. Nếu dòng nào để trống → file đó sẽ dùng tên mặc định."
+        ? "Mẹo: Copy từ Excel/Word: mỗi dòng 1 tên. Dòng nào để trống → trang đó sẽ dùng tên mặc định."
         : "";
-      if (on) setTimeout(() => namesText.focus(), 50);
+      if (on) setTimeout(() => namesText.focus(), 30);
     });
 
-    // Trả về Promise: null = user hủy; {useNames:boolean, lines:string[]} = tiếp tục
     function askNamesForSingleSplit(pageCount){
       return new Promise((resolve) => {
         openNameModal(pageCount);
@@ -523,21 +827,17 @@ GiayDangKyKetHon
 
         const baseFromFile = getBaseName(currentFile.name);
         const zip = new JSZip();
-
         const zipName = (zipNameInput.value || "").trim() || `${baseFromFile}_split.zip`;
 
         log(`Chế độ: ${mode}`, "ok");
         log(`Tổng trang: ${pageCount}`, "ok");
 
-        // ===== 1) Xây groups theo mode =====
         let groups = [];
 
-        // Names list for single mode (optional)
-        let singleNameLines = null;   // raw lines
+        let singleNameLines = null;
         let useSingleNames = false;
 
         if (mode === "single"){
-          // hỏi đặt tên trước khi tách
           const modalResult = await askNamesForSingleSplit(pageCount);
           if (!modalResult){
             setStatus("Đã huỷ");
@@ -610,7 +910,6 @@ GiayDangKyKetHon
           log(`Đã chia thành ${groups.length} file theo dung lượng ~≤ ${limitMB} MB.`, "ok");
         }
 
-        // ===== 2) Xuất file vào ZIP =====
         setStatus("Đang tạo file & đưa vào ZIP...");
         let outCount = 0;
 
@@ -642,14 +941,11 @@ GiayDangKyKetHon
             const pages = groups[i];
             const bytes = await buildPdfBytesFromPages(srcDoc, pages);
 
-            let fnameBase;
-
             if (mode === "single") {
-              // pages = [pageNo]
               const pageNo = pages[0];
+              let fnameBase;
 
               if (useSingleNames) {
-                // lấy dòng tương ứng (1-based)
                 const raw = (singleNameLines && singleNameLines[pageNo - 1]) ? singleNameLines[pageNo - 1] : "";
                 const cleaned = sanitizeFileName(raw).replace(/\.pdf$/i, "").trim();
 
@@ -671,7 +967,6 @@ GiayDangKyKetHon
 
               if ((i+1) % 5 === 0 || i === groups.length - 1) log(`Đã tạo ${i+1}/${groups.length} file...`);
             } else {
-              // custom groups
               const fname = `${prefix}_${padNumber(i+1, 2)}_${pagesLabel(pages, width)}.pdf`;
               zip.file(fname, bytes);
               outCount++;
@@ -684,7 +979,6 @@ GiayDangKyKetHon
           }
         }
 
-        // ===== 3) Nén ZIP và tải xuống =====
         setStatus("Đang nén ZIP...");
         setBar(90);
 
