@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF Tool Kit - Tách & Gộp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #1e293b;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); }
+    .container { max-width: 900px; margin: 0 auto; }
+    
+    /* Header & Nav */
+    .header { text-align: center; margin-bottom: 25px; }
+    .header h1 { margin: 0; font-size: 24px; color: #0f172a; }
+    
+    .nav-main {
+      display: flex; justify-content: center; gap: 10px; margin-bottom: 25px;
+      background: #e2e8f0; padding: 5px; border-radius: 14px; width: fit-content; margin-left: auto; margin-right: auto;
+    }
+    .nav-btn {
+      border: none; background: transparent; padding: 10px 25px;
+      border-radius: 10px; font-weight: 600; cursor: pointer; color: #64748b; transition: .2s;
+    }
+    .nav-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+    /* Cards */
+    .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .card-header { padding: 15px 20px; background: #f8fafc; border-bottom: 1px solid var(--border); font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .step-num { background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+    .card-body { padding: 20px; }
+
+    /* Common UI */
+    .drop-zone { border: 2px dashed #cbd5e1; border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; background: #f8fafc; transition: .2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; }
+    .hidden { display: none !important; }
+    
+    .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: var(--radius); font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .btn-action:disabled { opacity: 0.6; cursor: not-allowed; background: #94a3b8; }
+    .btn-secondary { background: #e2e8f0; color: #475569; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;}
+
+    /* Split Specific */
+    .tabs { display: flex; gap: 5px; background: #f1f5f9; padding: 5px; border-radius: 10px; margin-bottom: 20px; }
+    .tab-btn { flex: 1; border: none; background: transparent; padding: 8px; border-radius: 8px; color: #64748b; cursor: pointer; font-weight: 500; font-size: 13px;}
+    .tab-btn.active { background: white; color: var(--primary); font-weight: 600; shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    
+    input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
+    .hint { font-size: 12px; color: #64748b; margin-top: -5px; margin-bottom: 10px; }
+
+    /* Merge Specific */
+    .file-list { list-style: none; padding: 0; margin: 15px 0; max-height: 250px; overflow-y: auto; }
+    .file-item { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 10px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .file-item .name { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+    .file-remove { color: #ef4444; cursor: pointer; font-weight: bold; padding: 5px; }
+
+    /* Logs */
+    .log-box { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; height: 150px; overflow-y: auto; margin-top: 15px; white-space: pre-wrap; }
+    .progress-bar { height: 6px; background: #10b981; width: 0%; transition: width 0.3s; border-radius: 3px; margin-top: 10px;}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Công cụ PDF Đa Năng</h1>
+    <p>Xử lý ngay trên trình duyệt - Bảo mật tuyệt đối</p>
+  </div>
+
+  <div class="nav-main">
+    <button class="nav-btn active" onclick="switchApp('split')">✂️ Tách PDF</button>
+    <button class="nav-btn" onclick="switchApp('merge')">🔗 Gộp PDF</button>
+  </div>
+
+  <div id="app-split">
+    <div class="card">
+      <div class="card-header"><div class="step-num">1</div> Chọn File PDF cần tách</div>
+      <div class="card-body">
+        <label class="drop-zone" id="dropSplit">
+          <input type="file" id="fileSplit" accept="application/pdf" hidden>
+          <div style="font-size:24px">📂</div>
+          <span>Bấm chọn hoặc Kéo thả file PDF vào đây</span>
+          <div id="fileSplitInfo" style="margin-top:10px; color:var(--primary); font-weight:600"></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="step-num">2</div> Cấu hình tách</div>
+      <div class="card-body">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="setSplitMode('single', this)">Tách lẻ từng trang</button>
+          <button class="tab-btn" onclick="setSplitMode('custom', this)">Tách theo nhóm</button>
+          <button class="tab-btn" onclick="setSplitMode('size', this)">Tách theo dung lượng</button>
+        </div>
+
+        <div id="split-mode-single">
+          <label>Đặt tên file theo danh sách (Tuỳ chọn)</label>
+          <textarea id="splitNames" rows="5" placeholder="Dán danh sách tên (Excel/Word)... Dòng 1 cho Trang 1, v.v."></textarea>
+        </div>
+
+        <div id="split-mode-custom" class="hidden">
+          <label>Nhập trang (VD: 1-3|4-6|7,9)</label>
+          <input type="text" id="customRange">
+          <label>Tên tương ứng từng nhóm</label>
+          <textarea id="customNames" rows="3"></textarea>
+        </div>
+
+        <div id="split-mode-size" class="hidden">
+          <label>Dung lượng tối đa mỗi file (MB)</label>
+          <input type="number" id="splitMaxMB" value="5">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <button id="btnDoSplit" class="btn-action" disabled>🚀 Tách File Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="app-merge" class="hidden">
+    <div class="card">
+      <div class="card-header"><div class="step-num">1</div> Chọn các File PDF cần gộp</div>
+      <div class="card-body">
+        <label class="drop-zone" id="dropMerge">
+          <input type="file" id="fileMerge" accept="application/pdf" multiple hidden>
+          <div style="font-size:24px">📚</div>
+          <span>Chọn nhiều file hoặc Kéo thả nhiều file vào đây</span>
+        </label>
+        
+        <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center">
+          <strong>Danh sách file (<span id="mergeCount">0</span>):</strong>
+          <button class="btn-secondary" onclick="clearMergeList()">Xoá hết</button>
+        </div>
+        <ul id="mergeList" class="file-list"></ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="step-num">2</div> Xử lý</div>
+      <div class="card-body">
+        <label>Tên file kết quả</label>
+        <input type="text" id="mergeOutName" value="Merged_File.pdf">
+        <button id="btnDoMerge" class="btn-action" disabled>🔗 Gộp File Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding-top:0">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="log-box" id="logBox">Sẵn sàng. Vui lòng chọn chức năng.</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; color:#94a3b8; font-size:12px; margin-top:10px">
+    © Baotg10 - Local PDF Processing
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script>
+  // === GLOBAL STATE ===
+  const $ = (id) => document.getElementById(id);
+  let splitFile = null;
+  let splitFileBytes = null;
+  let splitMode = 'single';
+  
+  let mergeFiles = []; // Array of {name, bytes}
+
+  // === NAVIGATION ===
+  function switchApp(app) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    $('app-split').classList.add('hidden');
+    $('app-merge').classList.add('hidden');
+    
+    $(`app-${app}`).classList.remove('hidden');
+    log(`Đã chuyển sang chế độ: ${app === 'split' ? 'TÁCH FILE' : 'GỘP FILE'}`);
+  }
+
+  function log(msg) {
+    const d = document.createElement('div');
+    d.textContent = `> ${msg}`;
+    $('logBox').appendChild(d);
+    $('logBox').scrollTop = $('logBox').scrollHeight;
+  }
+  function setProgress(p) { $('progressBar').style.width = p + '%'; }
+
+  // ==========================
+  // LOGIC: SPLIT PDF
+  // ==========================
+  
+  // 1. Setup Dropzone & Input
+  const dropSplit = $('dropSplit');
+  const fileSplitInput = $('fileSplit');
+  
+  setupDragDrop(dropSplit, (files) => handleSplitFile(files[0]));
+  fileSplitInput.addEventListener('change', () => handleSplitFile(fileSplitInput.files[0]));
+
+  async function handleSplitFile(f) {
+    if(!f || f.type !== 'application/pdf') return alert('Chỉ chọn file PDF!');
+    splitFile = f;
+    $('fileSplitInfo').textContent = `📄 ${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
+    $('btnDoSplit').disabled = false;
+    log(`Đã chọn file tách: ${f.name}`);
+    splitFileBytes = await f.arrayBuffer();
+  }
+
+  function setSplitMode(mode, btn) {
+    splitMode = mode;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    $('split-mode-single').classList.add('hidden');
+    $('split-mode-custom').classList.add('hidden');
+    $('split-mode-size').classList.add('hidden');
+    $(`split-mode-${mode}`).classList.remove('hidden');
+  }
+
+  $('btnDoSplit').addEventListener('click', async () => {
+    if(!splitFileBytes) return;
+    $('btnDoSplit').disabled = true;
+    log('Đang xử lý tách file...');
+    setProgress(20);
+
+    try {
+      const pdfDoc = await PDFLib.PDFDocument.load(splitFileBytes);
+      const pageCount = pdfDoc.getPageCount();
+      const zip = new JSZip();
+      
+      let groups = [];
+      let names = [];
+
+      // Logic phân nhóm (tương tự code cũ)
+      if(splitMode === 'single') {
+        for(let i=1; i<=pageCount; i++) groups.push([i]);
+        names = $('splitNames').value.split('\n').map(x=>x.trim());
+      } 
+      else if(splitMode === 'custom') {
+        // Parse range: 1-3|4,5
+        const ranges = $('customRange').value.split('|');
+        ranges.forEach(r => {
+           let g = [];
+           r.split(',').forEach(part => {
+             if(part.includes('-')) {
+               let [s,e] = part.split('-').map(Number);
+               for(let i=s; i<=e; i++) if(i<=pageCount) g.push(i);
+             } else {
+               let n = Number(part);
+               if(n<=pageCount) g.push(n);
+             }
+           });
+           if(g.length) groups.push(g);
+        });
+        names = $('customNames').value.split('\n').map(x=>x.trim());
+      }
+      else if(splitMode === 'size') {
+        // Logic tách theo size (ước lượng)
+        log('Đang tính toán dung lượng...');
+        const maxBytes = $('splitMaxMB').value * 1024 * 1024;
+        let currentG = [];
+        let currentSize = 0;
+        
+        // Tạo doc tạm để đo
+        for(let i=0; i<pageCount; i++) {
+            const temp = await PDFLib.PDFDocument.create();
+            const [cp] = await temp.copyPages(pdfDoc, [i]);
+            temp.addPage(cp);
+            const b = await temp.save();
+            
+            if(currentG.length > 0 && (currentSize + b.length) > maxBytes) {
+                groups.push(currentG);
+                currentG = [];
+                currentSize = 0;
+            }
+            currentG.push(i+1);
+            currentSize += b.length;
+        }
+        if(currentG.length) groups.push(currentG);
+      }
+
+      // Xuất file
+      for(let i=0; i<groups.length; i++) {
+        const newPdf = await PDFLib.PDFDocument.create();
+        const pages = await newPdf.copyPages(pdfDoc, groups[i].map(x=>x-1));
+        pages.forEach(p => newPdf.addPage(p));
+        const savedBytes = await newPdf.save();
+        
+        let fname = (names[i] || `${splitFile.name.replace('.pdf','')}_part${i+1}`).replace(/[^\w\s-]/g,'_');
+        zip.file(`${fname}.pdf`, savedBytes);
+        setProgress(30 + (i/groups.length)*60);
+      }
+
+      const content = await zip.generateAsync({type:"blob"});
+      downloadBlob(content, "Split_Result.zip");
+      log('✅ Tách xong! Đang tải file ZIP.');
+      setProgress(100);
+
+    } catch(e) {
+      log(`❌ Lỗi: ${e.message}`);
+    } finally {
+      $('btnDoSplit').disabled = false;
+    }
+  });
+
+  // ==========================
+  // LOGIC: MERGE PDF
+  // ==========================
+  
+  const dropMerge = $('dropMerge');
+  const fileMergeInput = $('fileMerge');
+  const mergeList = $('mergeList');
+
+  setupDragDrop(dropMerge, (files) => addFilesToMerge(files));
+  fileMergeInput.addEventListener('change', () => addFilesToMerge(fileMergeInput.files));
+
+  async function addFilesToMerge(files) {
+    log(`Đang đọc ${files.length} file...`);
+    for(let f of files) {
+      if(f.type !== 'application/pdf') continue;
+      try {
+        const buf = await f.arrayBuffer();
+        mergeFiles.push({ name: f.name, bytes: buf });
+        renderMergeList();
+      } catch(e) { log(`Lỗi đọc file ${f.name}`); }
+    }
+    updateMergeBtn();
+  }
+
+  function renderMergeList() {
+    mergeList.innerHTML = '';
+    mergeFiles.forEach((item, idx) => {
+      const li = document.createElement('li');
+      li.className = 'file-item';
+      li.innerHTML = `
+        <span class="name">📄 ${idx+1}. ${item.name}</span>
+        <span class="file-remove" onclick="removeMergeFile(${idx})">✕</span>
+      `;
+      mergeList.appendChild(li);
+    });
+    $('mergeCount').textContent = mergeFiles.length;
+  }
+
+  window.removeMergeFile = (idx) => {
+    mergeFiles.splice(idx, 1);
+    renderMergeList();
+    updateMergeBtn();
+  }
+
+  window.clearMergeList = () => {
+    mergeFiles = [];
+    renderMergeList();
+    updateMergeBtn();
+  }
+
+  function updateMergeBtn() {
+    $('btnDoMerge').disabled = mergeFiles.length < 2;
+  }
+
+  $('btnDoMerge').addEventListener('click', async () => {
+    $('btnDoMerge').disabled = true;
+    log('Đang tiến hành gộp file...');
+    setProgress(10);
+    
+    try {
+      const mergedPdf = await PDFLib.PDFDocument.create();
+      
+      for(let i=0; i<mergeFiles.length; i++) {
+        const srcDoc = await PDFLib.PDFDocument.load(mergeFiles[i].bytes);
+        const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
+        copiedPages.forEach(p => mergedPdf.addPage(p));
+        
+        log(`+ Đã thêm file: ${mergeFiles[i].name}`);
+        setProgress(10 + ((i+1)/mergeFiles.length)*80);
+      }
+      
+      // Lưu và tối ưu hoá nhẹ
+      const mergedBytes = await mergedPdf.save(); 
+      
+      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+      const name = $('mergeOutName').value || 'Merged.pdf';
+      downloadBlob(blob, name.endsWith('.pdf') ? name : name+'.pdf');
+      
+      log('✅ Gộp hoàn tất! Đang tải xuống.');
+      setProgress(100);
+    } catch(e) {
+      log(`❌ Lỗi gộp file: ${e.message}`);
+      console.error(e);
+    } finally {
+      $('btnDoMerge').disabled = false;
+    }
+  });
+
+  // ==========================
+  // UTILS
+  // ==========================
+  function setupDragDrop(elem, callback) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => {
+      elem.addEventListener(e, (ev) => {
+        ev.preventDefault(); ev.stopPropagation();
+      }, false);
+    });
+    elem.addEventListener('dragover', () => elem.classList.add('dragover'));
+    elem.addEventListener('dragleave', () => elem.classList.remove('dragover'));
+    elem.addEventListener('drop', (e) => {
+      elem.classList.remove('dragover');
+      if(e.dataTransfer.files.length) callback(e.dataTransfer.files);
+    });
+  }
+
+  function downloadBlob(blob, name) {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = name;
+    link.click();
+  }
+</script>
+</body>
+</html>
