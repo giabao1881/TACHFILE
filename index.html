@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PDF Tool Kit - Tách | Gộp | Nén</title>
+  <title>PDF Tool Kit - Tạo bởi baotg10</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
       --primary: #2563eb;
-      --bg-body: #f8fafc;
+      --bg-body: #f1f5f9;
       --bg-card: #ffffff;
       --text-main: #1e293b;
       --border: #e2e8f0;
@@ -20,45 +20,59 @@
     body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); }
     .container { max-width: 900px; margin: 0 auto; }
     
-    .header { text-align: center; margin-bottom: 20px; }
+    /* BRANDING HEADER */
+    .header { text-align: center; margin-bottom: 25px; }
+    .header h1 { margin: 0; font-size: 26px; color: #0f172a; font-weight: 800; }
+    .header .subtitle { color: var(--primary); font-weight: 600; margin-top: 5px; font-size: 15px; }
+    
     .nav-main { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;}
     .nav-btn { border: none; background: #e2e8f0; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; color: #64748b; transition:.2s; }
     .nav-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
 
     .card { background: var(--bg-card); border-radius: var(--radius); box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 15px; padding: 20px; }
-    .step-badge { background: #3b82f6; color: white; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; margin-right: 5px; }
+    .step-badge { background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; margin-right: 8px; font-weight: bold; }
     .card h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center;}
 
     /* Drop Zone */
-    .drop-zone { border: 2px dashed #cbd5e1; border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; background: #f8fafc; transition: .2s; display: block; }
-    .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; transform: scale(1.01); }
+    .drop-zone { border: 2px dashed #94a3b8; border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; background: #f8fafc; transition: .2s; display: block; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; transform: scale(1.005); }
     
     .form-group { margin-bottom: 15px; }
-    label { display: block; font-weight: 500; margin-bottom: 5px; font-size: 14px; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #334155; }
     input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 14px; }
     
-    .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 16px; transition: .2s; }
-    .btn-action:hover { background: #1d4ed8; }
-    .btn-action:disabled { background: #94a3b8; cursor: not-allowed; }
+    .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 16px; transition: .2s; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4); }
+    .btn-action:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-action:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
 
     /* Tabs Split */
-    .tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; margin-bottom: 15px; }
-    .tab-item { flex: 1; text-align: center; padding: 8px; cursor: pointer; border-radius: 6px; font-size: 13px; font-weight: 500; color: #64748b; }
-    .tab-item.active { background: white; color: var(--primary); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
+    .tab-item { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; color: #64748b; transition: .2s; }
+    .tab-item.active { background: white; color: var(--primary); font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
     .hidden { display: none !important; }
     
-    .log-area { background: #1e293b; color: #fff; padding: 10px; border-radius: 8px; height: 150px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 10px; }
-    .file-tag { display: inline-block; background: #e2e8f0; padding: 5px 10px; border-radius: 15px; font-size: 12px; margin: 2px; font-weight: 500; border: 1px solid #cbd5e1; }
+    /* Guide Box Styles - Làm hướng dẫn dễ hiểu hơn */
+    .guide-box {
+      background: #eff6ff; border-left: 4px solid var(--primary);
+      padding: 12px; margin-bottom: 15px; border-radius: 4px;
+      font-size: 13.5px; line-height: 1.5; color: #1e3a8a;
+    }
+    .guide-title { font-weight: 700; display: block; margin-bottom: 4px; color: #172554; }
+    .guide-example { background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 4px; border: 1px solid #bfdbfe; font-family: monospace; font-weight: bold; color: #d946ef; }
+
+    .log-area { background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 8px; height: 120px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 10px; }
+    .file-tag { display: inline-block; background: #f1f5f9; padding: 4px 10px; border-radius: 4px; font-size: 13px; margin: 4px 0; border: 1px solid #cbd5e1; width: 100%; display: flex; justify-content: space-between; }
     
-    .warning-box { background: #fff7ed; border: 1px solid #fdba74; color: #c2410c; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; }
+    .footer-brand { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 13px; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <div class="header">
-    <h2>🛠️ PDF Tool Kit V4</h2>
+    <h1>PDF TOOL KIT V5</h1>
+    <div class="subtitle">✨ Phát triển bởi baotg10 ✨</div>
   </div>
 
   <div class="nav-main">
@@ -72,52 +86,76 @@
       <h3><span class="step-badge">1</span> Chọn File PDF Gốc</h3>
       <label class="drop-zone" id="dropSplit">
         <input type="file" id="fileSplit" accept="application/pdf" hidden>
-        <div style="font-size: 28px;">📂</div>
-        <div>Click hoặc Kéo file vào đây</div>
-        <div id="splitInfo" style="color:var(--primary); font-weight:bold; margin-top:5px"></div>
+        <div style="font-size: 32px;">📂</div>
+        <div><b>Bấm vào đây</b> để chọn file hoặc Kéo thả file vào</div>
+        <div id="splitInfo" style="color:var(--primary); font-weight:bold; margin-top:8px"></div>
       </label>
     </div>
+    
     <div class="card">
-      <h3><span class="step-badge">2</span> Cấu hình</h3>
+      <h3><span class="step-badge">2</span> Chọn Kiểu Tách (Đọc kỹ hướng dẫn)</h3>
       <div class="tabs">
-        <div class="tab-item active" onclick="setSplitMode('single', this)">Tách lẻ</div>
-        <div class="tab-item" onclick="setSplitMode('custom', this)">Tách nhóm</div>
-        <div class="tab-item" onclick="setSplitMode('size', this)">Theo MB</div>
+        <div class="tab-item active" onclick="setSplitMode('single', this)">1. Tách Rời (Từng trang)</div>
+        <div class="tab-item" onclick="setSplitMode('custom', this)">2. Tách Nhóm (Tuỳ chọn)</div>
+        <div class="tab-item" onclick="setSplitMode('size', this)">3. Tách Theo Dung Lượng</div>
       </div>
+
       <div id="mode-single">
-        <label>Danh sách tên file (Tuỳ chọn):</label>
-        <textarea id="splitNames" placeholder="Dán danh sách tên..."></textarea>
+        <div class="guide-box">
+          <span class="guide-title">💡 Giải thích:</span>
+          Chế độ này sẽ cắt nhỏ toàn bộ file gốc. File gốc có 100 trang sẽ ra 100 file PDF nhỏ.<br>
+          <i>Phù hợp khi bạn muốn lấy riêng lẻ từng tờ một.</i>
+        </div>
+        <label>Danh sách tên file mới (Không bắt buộc):</label>
+        <textarea id="splitNames" placeholder="Dán danh sách tên vào đây... Dòng 1 đặt cho trang 1, Dòng 2 cho trang 2..."></textarea>
       </div>
+
       <div id="mode-custom" class="hidden">
-        <label>Công thức (VD: 1-5 | 8 | 10-12):</label>
-        <input type="text" id="customRange">
-        <label style="margin-top:10px">Tên từng nhóm:</label>
-        <textarea id="customNames"></textarea>
+        <div class="guide-box">
+          <span class="guide-title">💡 Hướng dẫn nhập công thức:</span>
+          Dùng dấu gạch đứng <span class="guide-example">|</span> để chia file.<br>
+          Dùng dấu gạch ngang <span class="guide-example">-</span> để lấy khoảng trang.<br><br>
+          <b>Ví dụ:</b> Bạn muốn tách làm 3 file:<br>
+          • File 1: Lấy từ trang 1 đến 5<br>
+          • File 2: Chỉ lấy trang 8<br>
+          • File 3: Lấy từ trang 10 đến 12<br>
+          👉 <b>Nhập vào ô dưới:</b> <span class="guide-example">1-5 | 8 | 10-12</span>
+        </div>
+        <label>Nhập trang cần tách:</label>
+        <input type="text" id="customRange" placeholder="VD: 1-5 | 8 | 10-12">
+        <label style="margin-top:15px">Đặt tên cho từng nhóm (Mỗi dòng 1 tên):</label>
+        <textarea id="customNames" placeholder="Tên cho nhóm 1...&#10;Tên cho nhóm 2..."></textarea>
       </div>
+
       <div id="mode-size" class="hidden">
-        <label>Giới hạn (MB):</label>
-        <input type="number" id="splitMaxMB" value="5">
+        <div class="guide-box">
+          <span class="guide-title">💡 Giải thích:</span>
+          Dùng khi file quá nặng không gửi Zalo/Email được. Tool sẽ tự động gom các trang lại, khi nào <b>gần đủ dung lượng</b> bạn cài đặt (ví dụ 5MB) thì nó sẽ cắt sang file mới.
+        </div>
+        <label>Giới hạn dung lượng mỗi file (MB):</label>
+        <input type="number" id="splitMaxMB" value="5" style="font-weight:bold; color:var(--primary)">
       </div>
     </div>
-    <button id="btnSplit" class="btn-action" disabled>🚀 Tách Ngay</button>
+
+    <button id="btnSplit" class="btn-action" disabled>🚀 Tách File Ngay</button>
   </div>
 
   <div id="app-merge" class="hidden">
     <div class="card">
-      <h3><span class="step-badge">1</span> Chọn File Gộp</h3>
+      <h3><span class="step-badge">1</span> Chọn File Cần Gộp</h3>
       <label class="drop-zone" id="dropMerge">
         <input type="file" id="fileMerge" accept="application/pdf" multiple hidden>
-        <div style="font-size: 28px;">📚</div>
-        <div>Chọn hoặc Kéo nhiều file</div>
+        <div style="font-size: 32px;">📚</div>
+        <div>Chọn nhiều file cùng lúc hoặc Kéo thả vào</div>
       </label>
-      <div id="mergeList" style="margin-top:10px"></div>
+      <div id="mergeList" style="margin-top:15px"></div>
     </div>
     <div class="card">
-      <h3><span class="step-badge">2</span> Lưu</h3>
-      <label>Tên file ra:</label>
-      <input type="text" id="mergeName" value="Gop_File.pdf">
+      <h3><span class="step-badge">2</span> Lưu File</h3>
+      <label>Đặt tên file kết quả:</label>
+      <input type="text" id="mergeName" value="File_Da_Gop_baotg10.pdf">
     </div>
-    <button id="btnMerge" class="btn-action" disabled>🔗 Gộp Ngay</button>
+    <button id="btnMerge" class="btn-action" disabled>🔗 Gộp File Ngay</button>
   </div>
 
   <div id="app-compress" class="hidden">
@@ -125,29 +163,33 @@
       <h3><span class="step-badge">1</span> Chọn File Cần Nén</h3>
       <label class="drop-zone" id="dropCompress">
         <input type="file" id="fileCompress" accept="application/pdf" hidden>
-        <div style="font-size: 28px;">🗜️</div>
+        <div style="font-size: 32px;">🗜️</div>
         <div>Chọn file PDF dung lượng lớn</div>
-        <div id="compressInfo" style="color:var(--primary); font-weight:bold; margin-top:5px"></div>
+        <div id="compressInfo" style="color:var(--primary); font-weight:bold; margin-top:8px"></div>
       </label>
     </div>
     
     <div class="card">
-      <h3><span class="step-badge">2</span> Mức độ nén</h3>
-      <div class="warning-box">
-        ⚠️ <b>Lưu ý:</b> Chế độ này sẽ chuyển trang PDF thành ảnh rồi nén lại. <br>
-        File sẽ nhẹ hơn nhiều nhưng <b>không thể bôi đen/copy chữ</b> được nữa.
+      <h3><span class="step-badge">2</span> Chọn Mức Độ Nén</h3>
+      <div class="guide-box" style="background:#fff7ed; border-color:#f97316; color:#c2410c">
+        ⚠️ <b>Lưu ý quan trọng:</b> Chức năng này sẽ chuyển đổi PDF thành dạng Ảnh để giảm dung lượng tối đa. File sau khi nén sẽ <b>không thể copy chữ</b> được nữa.
       </div>
-      <label>Chất lượng ảnh đầu ra:</label>
+      <label>Chất lượng đầu ra:</label>
       <select id="compressQuality">
-        <option value="0.4">Nén Mạnh (File rất nhẹ, ảnh mờ)</option>
+        <option value="0.4">Nén Mạnh (File rất nhẹ - Ảnh mờ)</option>
         <option value="0.6" selected>Nén Vừa (Khuyên dùng)</option>
-        <option value="0.8">Nén Ít (Giữ nét, giảm ít)</option>
+        <option value="0.8">Nén Ít (File nét - Giảm ít)</option>
       </select>
     </div>
     <button id="btnCompress" class="btn-action" disabled>📉 Bắt đầu Nén</button>
   </div>
 
   <div class="log-area" id="logBox">Sẵn sàng...</div>
+  
+  <div class="footer-brand">
+    © 2024 Bản quyền công cụ thuộc về <b>baotg10</b>.<br>
+    Vui lòng ghi rõ nguồn nếu chia sẻ.
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
@@ -158,19 +200,16 @@
   // Cấu hình Worker cho PDF.js
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-  // Chặn mở file
-  window.addEventListener("dragover", e => e.preventDefault());
-  window.addEventListener("drop", e => e.preventDefault());
-
+  // --- GLOBAL VARIABLES ---
   const $ = (id) => document.getElementById(id);
   const logBox = $('logBox');
   function log(m) { logBox.innerHTML += `<div>> ${m}</div>`; logBox.scrollTop = logBox.scrollHeight; }
 
-  // --- STATE ---
-  let splitBytes=null, splitName='', splitMode='single';
-  let mergeFiles=[], compressBytes=null, compressName='';
+  // CHẶN KÉO THẢ MỞ FILE
+  window.addEventListener("dragover", e => e.preventDefault());
+  window.addEventListener("drop", e => e.preventDefault());
 
-  // --- NAV ---
+  // --- NAVIGATION ---
   function setApp(app) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
@@ -178,7 +217,6 @@
     $(`app-${app}`).classList.remove('hidden');
   }
 
-  // --- DROP HELPER ---
   function setupDrop(id, cb) {
     const el = $(id);
     el.addEventListener('dragenter', ()=>el.classList.add('dragover'));
@@ -192,15 +230,24 @@
     });
   }
 
-  // ================= TÁCH =================
+  function save(blob, name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+  }
+
+  // ================= 1. LOGIC TÁCH (SPLIT) =================
+  let splitBytes=null, splitName='', splitMode='single';
+
   setupDrop('dropSplit', async (files)=>{
     const f = files[0];
-    if(f.type!=='application/pdf') return alert('Phải là PDF');
+    if(f.type!=='application/pdf') return alert('Vui lòng chọn file PDF!');
     splitBytes = await f.arrayBuffer();
     splitName = f.name.replace('.pdf','');
-    $('splitInfo').textContent = `${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
+    $('splitInfo').textContent = `✅ Đã chọn: ${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
     $('btnSplit').disabled=false;
-    log(`Đã nạp file tách: ${f.name}`);
+    log(`Đã nạp file: ${f.name}`);
   });
 
   window.setSplitMode = (m, el) => {
@@ -213,14 +260,13 @@
 
   $('btnSplit').addEventListener('click', async ()=>{
     if(!splitBytes) return;
-    $('btnSplit').disabled=true; log('Đang tách...');
+    const btn = $('btnSplit'); btn.disabled=true; btn.innerText="⏳ Đang xử lý...";
     try {
       const pdfDoc = await PDFLib.PDFDocument.load(splitBytes);
       const total = pdfDoc.getPageCount();
       const zip = new JSZip();
       let groups = [];
       
-      // Logic phân nhóm
       if(splitMode==='single') {
         for(let i=0; i<total; i++) groups.push([i]);
       } else if(splitMode==='custom') {
@@ -238,6 +284,7 @@
           if(g.length) groups.push(g);
         });
       } else {
+        log('Đang tính toán dung lượng...');
         const max = $('splitMaxMB').value * 1024 * 1024;
         let curG=[], curS=0;
         for(let i=0; i<total; i++) {
@@ -251,7 +298,6 @@
         if(curG.length) groups.push(curG);
       }
 
-      // Tạo file
       const names = (splitMode==='single' ? $('splitNames').value : $('customNames').value).split('\n');
       for(let i=0; i<groups.length; i++){
         const newPdf = await PDFLib.PDFDocument.create();
@@ -259,16 +305,18 @@
         cp.forEach(p=>newPdf.addPage(p));
         const b = await newPdf.save();
         let fn = names[i]?.trim() || `${splitName}_Part_${i+1}`;
+        fn = fn.replace(/[\\/:*?"<>|]/g, "_");
         zip.file(`${fn}.pdf`, b);
       }
       const z = await zip.generateAsync({type:'blob'});
-      save(z, 'Split_Result.zip');
-      log('✅ Tách xong!');
-    } catch(e) { log('❌ Lỗi: '+e.message); }
-    $('btnSplit').disabled=false;
+      save(z, `${splitName}_Split_by_baotg10.zip`);
+      log('✅ Tách thành công! Đang tải xuống...');
+    } catch(e) { log('❌ Lỗi: '+e.message); alert('Kiểm tra lại công thức nhập!'); }
+    btn.disabled=false; btn.innerText="🚀 Tách File Ngay";
   });
 
-  // ================= GỘP =================
+  // ================= 2. LOGIC GỘP (MERGE) =================
+  let mergeFiles=[];
   setupDrop('dropMerge', async (files)=>{
     for(let f of files) {
       if(f.type==='application/pdf') mergeFiles.push({name:f.name, data:await f.arrayBuffer()});
@@ -276,13 +324,17 @@
     renderMerge();
   });
   function renderMerge(){
-    $('mergeList').innerHTML = mergeFiles.map((f,i)=>`<span class="file-tag">${i+1}. ${f.name} <b style="color:red;cursor:pointer" onclick="delMerge(${i})">x</b></span>`).join('');
+    $('mergeList').innerHTML = mergeFiles.map((f,i)=>`
+      <div class="file-tag">
+        <span>${i+1}. ${f.name}</span>
+        <span style="color:red;cursor:pointer;font-weight:bold" onclick="delMerge(${i})">✕ Xoá</span>
+      </div>`).join('');
     $('btnMerge').disabled = mergeFiles.length<2;
   }
   window.delMerge = (i) => { mergeFiles.splice(i,1); renderMerge(); }
 
   $('btnMerge').addEventListener('click', async ()=>{
-    $('btnMerge').disabled=true; log('Đang gộp...');
+    const btn = $('btnMerge'); btn.disabled=true; btn.innerText="⏳ Đang gộp...";
     try {
       const doc = await PDFLib.PDFDocument.create();
       for(let f of mergeFiles){
@@ -291,85 +343,60 @@
         cp.forEach(p=>doc.addPage(p));
       }
       save(new Blob([await doc.save()],{type:'application/pdf'}), $('mergeName').value);
-      log('✅ Gộp xong!');
+      log('✅ Gộp thành công!');
     } catch(e){ log('❌ Lỗi: '+e.message); }
-    $('btnMerge').disabled=false;
+    btn.disabled=false; btn.innerText="🔗 Gộp File Ngay";
   });
 
-  // ================= NÉN (COMPRESS) =================
+  // ================= 3. LOGIC NÉN (COMPRESS) =================
+  let compressBytes=null, compressName='';
   setupDrop('dropCompress', async (files)=>{
     const f = files[0];
-    if(f.type!=='application/pdf') return alert('Phải là PDF');
+    if(f.type!=='application/pdf') return alert('Chỉ hỗ trợ PDF!');
     compressBytes = await f.arrayBuffer();
     compressName = f.name;
-    $('compressInfo').textContent = `${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
+    $('compressInfo').textContent = `✅ File: ${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
     $('btnCompress').disabled=false;
     log(`Đã nạp file nén: ${f.name}`);
   });
 
   $('btnCompress').addEventListener('click', async ()=>{
     if(!compressBytes) return;
-    const btn = $('btnCompress');
-    btn.disabled=true; 
-    log('⏳ Đang nén (Quá trình này hơi lâu, vui lòng chờ)...');
+    const btn = $('btnCompress'); btn.disabled=true; btn.innerText="⏳ Đang xử lý (Sẽ hơi lâu)...";
     
     try {
       const quality = parseFloat($('compressQuality').value);
-      
-      // 1. Load PDF gốc bằng PDF.js để render ra ảnh
       const loadingTask = pdfjsLib.getDocument(compressBytes);
       const pdf = await loadingTask.promise;
       const total = pdf.numPages;
-      
-      // 2. Tạo PDF mới
       const newPdf = await PDFLib.PDFDocument.create();
 
       for (let i = 1; i <= total; i++) {
-        log(`Đang xử lý trang ${i}/${total}...`);
-        
+        log(`Đang nén trang ${i}/${total}...`);
         const page = await pdf.getPage(i);
-        // Scale 1.5 để giữ nét chữ tương đối, sau đó nén JPEG
         const viewport = page.getViewport({ scale: 1.5 });
-        
-        // Tạo canvas ảo
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-
-        // Convert canvas sang JPEG nén
         const imgDataUrl = canvas.toDataURL('image/jpeg', quality);
         const imgBytes = await fetch(imgDataUrl).then(res => res.arrayBuffer());
 
-        // Nhúng ảnh vào PDF mới
         const embeddedImg = await newPdf.embedJpg(imgBytes);
         const newPage = newPdf.addPage([viewport.width, viewport.height]);
-        newPage.drawImage(embeddedImg, {
-          x: 0, y: 0, width: viewport.width, height: viewport.height,
-        });
+        newPage.drawImage(embeddedImg, { x: 0, y: 0, width: viewport.width, height: viewport.height });
       }
 
       const resultBytes = await newPdf.save();
-      const blob = new Blob([resultBytes], {type: 'application/pdf'});
-      
-      log(`✅ Nén xong! Tải xuống...`);
-      save(blob, `Compressed_${compressName}`);
-
+      save(new Blob([resultBytes], {type: 'application/pdf'}), `Compressed_${compressName}`);
+      log(`✅ Nén xong! Đang tải xuống.`);
     } catch (e) {
-      log('❌ Lỗi nén: ' + e.message);
-      console.error(e);
+      log('❌ Lỗi nén: ' + e.message); console.error(e);
     }
-    btn.disabled = false;
+    btn.disabled = false; btn.innerText="📉 Bắt đầu Nén";
   });
-
-  function save(blob, name) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-  }
 </script>
 </body>
 </html>
