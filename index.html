@@ -20,7 +20,6 @@
     body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); }
     .container { max-width: 900px; margin: 0 auto; }
     
-    /* BRANDING HEADER */
     .header { text-align: center; margin-bottom: 25px; }
     .header h1 { margin: 0; font-size: 26px; color: #0f172a; font-weight: 800; }
     .header .subtitle { color: var(--primary); font-weight: 600; margin-top: 5px; font-size: 15px; }
@@ -33,7 +32,6 @@
     .step-badge { background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; margin-right: 8px; font-weight: bold; }
     .card h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center;}
 
-    /* Drop Zone */
     .drop-zone { border: 2px dashed #94a3b8; border-radius: var(--radius); padding: 30px; text-align: center; cursor: pointer; background: #f8fafc; transition: .2s; display: block; }
     .drop-zone:hover, .drop-zone.dragover { border-color: var(--primary); background: #eff6ff; transform: scale(1.005); }
     
@@ -45,14 +43,12 @@
     .btn-action:hover { background: #1d4ed8; transform: translateY(-1px); }
     .btn-action:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
 
-    /* Tabs Split */
     .tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
     .tab-item { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; color: #64748b; transition: .2s; }
     .tab-item.active { background: white; color: var(--primary); font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
     .hidden { display: none !important; }
     
-    /* Guide Box Styles - Làm hướng dẫn dễ hiểu hơn */
     .guide-box {
       background: #eff6ff; border-left: 4px solid var(--primary);
       padding: 12px; margin-bottom: 15px; border-radius: 4px;
@@ -76,9 +72,10 @@
   </div>
 
   <div class="nav-main">
-    <button class="nav-btn active" onclick="setApp('split')">✂️ Tách File</button>
-    <button class="nav-btn" onclick="setApp('merge')">🔗 Gộp File</button>
-    <button class="nav-btn" onclick="setApp('compress')">🗜️ Nén (Giảm MB)</button>
+    <button class="nav-btn active" onclick="setApp('split', event)">✂️ Tách File</button>
+    <button class="nav-btn" onclick="setApp('merge', event)">🔗 Gộp File</button>
+    <button class="nav-btn" onclick="setApp('compress', event)">🗜️ Nén (Giảm MB)</button>
+    <button class="nav-btn" onclick="setApp('img2pdf', event)">🖼️ Ảnh → PDF</button>
   </div>
 
   <div id="app-split">
@@ -184,6 +181,39 @@
     <button id="btnCompress" class="btn-action" disabled>📉 Bắt đầu Nén</button>
   </div>
 
+  <div id="app-img2pdf" class="hidden">
+    <div class="card">
+      <h3><span class="step-badge">1</span> Chọn Ảnh Cần Chuyển Thành PDF</h3>
+      <label class="drop-zone" id="dropImg2Pdf">
+        <input type="file" id="fileImg2Pdf" accept="image/*" multiple hidden>
+        <div style="font-size: 32px;">🖼️</div>
+        <div>Chọn nhiều ảnh cùng lúc hoặc Kéo thả vào</div>
+      </label>
+      <div id="img2pdfList" style="margin-top:15px"></div>
+    </div>
+
+    <div class="card">
+      <h3><span class="step-badge">2</span> Cài Đặt PDF Đầu Ra</h3>
+
+      <div class="guide-box">
+        <span class="guide-title">💡 Giải thích:</span>
+        Mỗi ảnh sẽ trở thành <b>1 trang PDF</b>.<br>
+        Tool sẽ tự căn trang theo đúng kích thước ảnh để không bị méo.
+      </div>
+
+      <label>Đặt tên file kết quả:</label>
+      <input type="text" id="img2pdfName" value="Anh_To_PDF_baotg10.pdf">
+
+      <label style="margin-top:15px">Cách đặt trang:</label>
+      <select id="img2pdfMode">
+        <option value="fit" selected>Giữ nguyên theo kích thước ảnh</option>
+        <option value="a4">Ép về khổ A4</option>
+      </select>
+    </div>
+
+    <button id="btnImg2Pdf" class="btn-action" disabled>🖼️➡️📄 Chuyển Thành PDF</button>
+  </div>
+
   <div class="log-area" id="logBox">Sẵn sàng...</div>
   
   <div class="footer-brand">
@@ -197,23 +227,19 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 
 <script>
-  // Cấu hình Worker cho PDF.js
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
-  // --- GLOBAL VARIABLES ---
   const $ = (id) => document.getElementById(id);
   const logBox = $('logBox');
   function log(m) { logBox.innerHTML += `<div>> ${m}</div>`; logBox.scrollTop = logBox.scrollHeight; }
 
-  // CHẶN KÉO THẢ MỞ FILE
   window.addEventListener("dragover", e => e.preventDefault());
   window.addEventListener("drop", e => e.preventDefault());
 
-  // --- NAVIGATION ---
-  function setApp(app) {
+  function setApp(app, ev) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    ['split','merge','compress'].forEach(k => $(`app-${k}`).classList.add('hidden'));
+    if (ev && ev.target) ev.target.classList.add('active');
+    ['split','merge','compress','img2pdf'].forEach(k => $(`app-${k}`).classList.add('hidden'));
     $(`app-${app}`).classList.remove('hidden');
   }
 
@@ -222,6 +248,7 @@
     el.addEventListener('dragenter', ()=>el.classList.add('dragover'));
     el.addEventListener('dragleave', ()=>el.classList.remove('dragover'));
     el.addEventListener('drop', (e)=>{
+      e.preventDefault();
       el.classList.remove('dragover');
       if(e.dataTransfer.files.length) cb(e.dataTransfer.files);
     });
@@ -235,18 +262,23 @@
     a.href = URL.createObjectURL(blob);
     a.download = name;
     a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
-  // ================= 1. LOGIC TÁCH (SPLIT) =================
-  let splitBytes=null, splitName='', splitMode='single';
+  function sanitizeFileName(name, fallback = 'output.pdf') {
+    const cleaned = (name || '').trim().replace(/[\\/:*?"<>|]/g, "_");
+    return cleaned || fallback;
+  }
+
+  let splitBytes = null, splitName = '', splitMode = 'single';
 
   setupDrop('dropSplit', async (files)=>{
     const f = files[0];
-    if(f.type!=='application/pdf') return alert('Vui lòng chọn file PDF!');
+    if(f.type !== 'application/pdf') return alert('Vui lòng chọn file PDF!');
     splitBytes = await f.arrayBuffer();
-    splitName = f.name.replace('.pdf','');
+    splitName = f.name.replace(/\.pdf$/i,'');
     $('splitInfo').textContent = `✅ Đã chọn: ${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
-    $('btnSplit').disabled=false;
+    $('btnSplit').disabled = false;
     log(`Đã nạp file: ${f.name}`);
   });
 
@@ -260,81 +292,120 @@
 
   $('btnSplit').addEventListener('click', async ()=>{
     if(!splitBytes) return;
-    const btn = $('btnSplit'); btn.disabled=true; btn.innerText="⏳ Đang xử lý...";
+    const btn = $('btnSplit');
+    btn.disabled = true;
+    btn.innerText = "⏳ Đang xử lý...";
+
     try {
       const pdfDoc = await PDFLib.PDFDocument.load(splitBytes);
       const total = pdfDoc.getPageCount();
       const zip = new JSZip();
       let groups = [];
       
-      if(splitMode==='single') {
+      if(splitMode === 'single') {
         for(let i=0; i<total; i++) groups.push([i]);
-      } else if(splitMode==='custom') {
-        const parts = $('customRange').value.split('|');
+      } else if(splitMode === 'custom') {
+        const raw = $('customRange').value.trim();
+        if (!raw) throw new Error('Bạn chưa nhập công thức tách.');
+
+        const parts = raw.split('|');
         parts.forEach(p => {
           let g = [];
           p.split(',').forEach(s => {
+            s = s.trim();
+            if (!s) return;
+
             if(s.includes('-')) {
-              let [a,b] = s.split('-').map(Number);
+              let [a,b] = s.split('-').map(x => Number(x.trim()));
+              if (isNaN(a) || isNaN(b) || a < 1 || b < a) return;
               for(let k=a; k<=b; k++) if(k<=total) g.push(k-1);
             } else {
-              let n=Number(s); if(n<=total) g.push(n-1);
+              let n = Number(s);
+              if(!isNaN(n) && n >= 1 && n <= total) g.push(n-1);
             }
           });
+
+          g = [...new Set(g)];
           if(g.length) groups.push(g);
         });
+
+        if (!groups.length) throw new Error('Công thức tách không hợp lệ.');
       } else {
         log('Đang tính toán dung lượng...');
-        const max = $('splitMaxMB').value * 1024 * 1024;
-        let curG=[], curS=0;
+        const max = Number($('splitMaxMB').value) * 1024 * 1024;
+        if (!max || max <= 0) throw new Error('Dung lượng MB không hợp lệ.');
+
+        let curG = [], curS = 0;
         for(let i=0; i<total; i++) {
           const t = await PDFLib.PDFDocument.create();
           const [cp] = await t.copyPages(pdfDoc,[i]);
           t.addPage(cp);
           const b = await t.save();
-          if(curG.length && (curS+b.length > max)) { groups.push(curG); curG=[]; curS=0; }
-          curG.push(i); curS+=b.length;
+          if(curG.length && (curS + b.length > max)) {
+            groups.push(curG);
+            curG = [];
+            curS = 0;
+          }
+          curG.push(i);
+          curS += b.length;
         }
         if(curG.length) groups.push(curG);
       }
 
-      const names = (splitMode==='single' ? $('splitNames').value : $('customNames').value).split('\n');
+      const names = (splitMode === 'single' ? $('splitNames').value : $('customNames').value).split('\n');
       for(let i=0; i<groups.length; i++){
         const newPdf = await PDFLib.PDFDocument.create();
         const cp = await newPdf.copyPages(pdfDoc, groups[i]);
         cp.forEach(p=>newPdf.addPage(p));
         const b = await newPdf.save();
         let fn = names[i]?.trim() || `${splitName}_Part_${i+1}`;
-        fn = fn.replace(/[\\/:*?"<>|]/g, "_");
+        fn = sanitizeFileName(fn, `${splitName}_Part_${i+1}.pdf`).replace(/\.pdf$/i, '');
         zip.file(`${fn}.pdf`, b);
       }
+
       const z = await zip.generateAsync({type:'blob'});
-      save(z, `${splitName}_Split_by_baotg10.zip`);
+      save(z, `${sanitizeFileName(splitName, 'PDF')}_Split_by_baotg10.zip`);
       log('✅ Tách thành công! Đang tải xuống...');
-    } catch(e) { log('❌ Lỗi: '+e.message); alert('Kiểm tra lại công thức nhập!'); }
-    btn.disabled=false; btn.innerText="🚀 Tách File Ngay";
+    } catch(e) {
+      log('❌ Lỗi: ' + e.message);
+      alert('Kiểm tra lại công thức nhập hoặc dữ liệu đầu vào.');
+    }
+
+    btn.disabled = false;
+    btn.innerText = "🚀 Tách File Ngay";
   });
 
-  // ================= 2. LOGIC GỘP (MERGE) =================
-  let mergeFiles=[];
+  let mergeFiles = [];
+
   setupDrop('dropMerge', async (files)=>{
     for(let f of files) {
-      if(f.type==='application/pdf') mergeFiles.push({name:f.name, data:await f.arrayBuffer()});
+      if(f.type === 'application/pdf') {
+        mergeFiles.push({name:f.name, data:await f.arrayBuffer()});
+      }
     }
     renderMerge();
+    if (files.length) log(`Đã thêm ${mergeFiles.length} file để gộp.`);
   });
+
   function renderMerge(){
     $('mergeList').innerHTML = mergeFiles.map((f,i)=>`
       <div class="file-tag">
         <span>${i+1}. ${f.name}</span>
         <span style="color:red;cursor:pointer;font-weight:bold" onclick="delMerge(${i})">✕ Xoá</span>
       </div>`).join('');
-    $('btnMerge').disabled = mergeFiles.length<2;
+    $('btnMerge').disabled = mergeFiles.length < 2;
   }
-  window.delMerge = (i) => { mergeFiles.splice(i,1); renderMerge(); }
+
+  window.delMerge = (i) => {
+    mergeFiles.splice(i,1);
+    renderMerge();
+  }
 
   $('btnMerge').addEventListener('click', async ()=>{
-    const btn = $('btnMerge'); btn.disabled=true; btn.innerText="⏳ Đang gộp...";
+    const btn = $('btnMerge');
+    btn.disabled = true;
+    btn.innerText = "⏳ Đang gộp...";
+
     try {
       const doc = await PDFLib.PDFDocument.create();
       for(let f of mergeFiles){
@@ -342,31 +413,39 @@
         const cp = await doc.copyPages(s, s.getPageIndices());
         cp.forEach(p=>doc.addPage(p));
       }
-      save(new Blob([await doc.save()],{type:'application/pdf'}), $('mergeName').value);
+      const fileName = sanitizeFileName($('mergeName').value, 'File_Da_Gop_baotg10.pdf');
+      save(new Blob([await doc.save()],{type:'application/pdf'}), fileName);
       log('✅ Gộp thành công!');
-    } catch(e){ log('❌ Lỗi: '+e.message); }
-    btn.disabled=false; btn.innerText="🔗 Gộp File Ngay";
+    } catch(e){
+      log('❌ Lỗi: ' + e.message);
+      alert('Có lỗi khi gộp file PDF.');
+    }
+
+    btn.disabled = false;
+    btn.innerText = "🔗 Gộp File Ngay";
   });
 
-  // ================= 3. LOGIC NÉN (COMPRESS) =================
-  let compressBytes=null, compressName='';
+  let compressBytes = null, compressName = '';
+
   setupDrop('dropCompress', async (files)=>{
     const f = files[0];
-    if(f.type!=='application/pdf') return alert('Chỉ hỗ trợ PDF!');
+    if(f.type !== 'application/pdf') return alert('Chỉ hỗ trợ PDF!');
     compressBytes = await f.arrayBuffer();
     compressName = f.name;
     $('compressInfo').textContent = `✅ File: ${f.name} (${(f.size/1e6).toFixed(2)} MB)`;
-    $('btnCompress').disabled=false;
+    $('btnCompress').disabled = false;
     log(`Đã nạp file nén: ${f.name}`);
   });
 
   $('btnCompress').addEventListener('click', async ()=>{
     if(!compressBytes) return;
-    const btn = $('btnCompress'); btn.disabled=true; btn.innerText="⏳ Đang xử lý (Sẽ hơi lâu)...";
+    const btn = $('btnCompress');
+    btn.disabled = true;
+    btn.innerText = "⏳ Đang xử lý (Sẽ hơi lâu)...";
     
     try {
       const quality = parseFloat($('compressQuality').value);
-      const loadingTask = pdfjsLib.getDocument(compressBytes);
+      const loadingTask = pdfjsLib.getDocument({ data: compressBytes });
       const pdf = await loadingTask.promise;
       const total = pdf.numPages;
       const newPdf = await PDFLib.PDFDocument.create();
@@ -390,12 +469,159 @@
       }
 
       const resultBytes = await newPdf.save();
-      save(new Blob([resultBytes], {type: 'application/pdf'}), `Compressed_${compressName}`);
+      save(new Blob([resultBytes], {type: 'application/pdf'}), `Compressed_${sanitizeFileName(compressName, 'file.pdf')}`);
       log(`✅ Nén xong! Đang tải xuống.`);
     } catch (e) {
-      log('❌ Lỗi nén: ' + e.message); console.error(e);
+      log('❌ Lỗi nén: ' + e.message);
+      console.error(e);
+      alert('Có lỗi khi nén file PDF.');
     }
-    btn.disabled = false; btn.innerText="📉 Bắt đầu Nén";
+
+    btn.disabled = false;
+    btn.innerText = "📉 Bắt đầu Nén";
+  });
+
+  let img2pdfFiles = [];
+
+  setupDrop('dropImg2Pdf', async (files) => {
+    for (let f of files) {
+      if (f.type.startsWith('image/')) {
+        img2pdfFiles.push({
+          name: f.name,
+          type: f.type,
+          data: await f.arrayBuffer()
+        });
+      }
+    }
+    renderImg2Pdf();
+    log(`Đã nạp ${img2pdfFiles.length} ảnh để chuyển PDF.`);
+  });
+
+  function renderImg2Pdf() {
+    $('img2pdfList').innerHTML = img2pdfFiles.map((f, i) => `
+      <div class="file-tag">
+        <span>${i+1}. ${f.name}</span>
+        <span style="color:red;cursor:pointer;font-weight:bold" onclick="delImg2Pdf(${i})">✕ Xoá</span>
+      </div>
+    `).join('');
+    $('btnImg2Pdf').disabled = img2pdfFiles.length < 1;
+  }
+
+  window.delImg2Pdf = (i) => {
+    img2pdfFiles.splice(i, 1);
+    renderImg2Pdf();
+  }
+
+  async function convertImageToJpegBytes(file) {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([file.data], { type: file.type });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(async (jpegBlob) => {
+            try {
+              const buffer = await jpegBlob.arrayBuffer();
+              URL.revokeObjectURL(url);
+              resolve(buffer);
+            } catch (err) {
+              URL.revokeObjectURL(url);
+              reject(err);
+            }
+          }, 'image/jpeg', 0.92);
+        } catch (err) {
+          URL.revokeObjectURL(url);
+          reject(err);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error(`Không đọc được ảnh: ${file.name}`));
+      };
+
+      img.src = url;
+    });
+  }
+
+  $('btnImg2Pdf').addEventListener('click', async () => {
+    const btn = $('btnImg2Pdf');
+    btn.disabled = true;
+    btn.innerText = "⏳ Đang chuyển ảnh thành PDF...";
+
+    try {
+      const pdfDoc = await PDFLib.PDFDocument.create();
+      const mode = $('img2pdfMode').value;
+
+      for (let i = 0; i < img2pdfFiles.length; i++) {
+        const file = img2pdfFiles[i];
+        log(`Đang xử lý ảnh ${i+1}/${img2pdfFiles.length}: ${file.name}`);
+
+        let embeddedImage;
+
+        if (file.type === 'image/png') {
+          embeddedImage = await pdfDoc.embedPng(file.data);
+        } else if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+          embeddedImage = await pdfDoc.embedJpg(file.data);
+        } else {
+          const jpegBytes = await convertImageToJpegBytes(file);
+          embeddedImage = await pdfDoc.embedJpg(jpegBytes);
+        }
+
+        const imgWidth = embeddedImage.width;
+        const imgHeight = embeddedImage.height;
+
+        let pageWidth, pageHeight, drawWidth, drawHeight, x, y;
+
+        if (mode === 'a4') {
+          pageWidth = 595.28;
+          pageHeight = 841.89;
+
+          const scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+          drawWidth = imgWidth * scale;
+          drawHeight = imgHeight * scale;
+          x = (pageWidth - drawWidth) / 2;
+          y = (pageHeight - drawHeight) / 2;
+        } else {
+          pageWidth = imgWidth;
+          pageHeight = imgHeight;
+          drawWidth = imgWidth;
+          drawHeight = imgHeight;
+          x = 0;
+          y = 0;
+        }
+
+        const page = pdfDoc.addPage([pageWidth, pageHeight]);
+        page.drawImage(embeddedImage, {
+          x,
+          y,
+          width: drawWidth,
+          height: drawHeight
+        });
+      }
+
+      const pdfBytes = await pdfDoc.save();
+      const fileName = sanitizeFileName($('img2pdfName').value, 'Anh_To_PDF_baotg10.pdf');
+      save(new Blob([pdfBytes], { type: 'application/pdf' }), fileName);
+      log('✅ Chuyển ảnh thành PDF thành công!');
+    } catch (e) {
+      log('❌ Lỗi chuyển ảnh sang PDF: ' + e.message);
+      console.error(e);
+      alert('Có lỗi khi chuyển ảnh sang PDF!');
+    }
+
+    btn.disabled = false;
+    btn.innerText = "🖼️➡️📄 Chuyển Thành PDF";
   });
 </script>
 </body>
